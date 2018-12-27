@@ -101,7 +101,8 @@ FDATA = {
     },
 }
 
-LINE_FILTER_ORDER = ["tmp_files", "regular_files", "dirs", "other_files"]
+LINE_FILTER_ORDER = ["tmp_files", "regular_files", "dirs",]
+LINE_FILTER_ORDER_FALLBACK = "other_files"
 LINE_OUTPUT_ORDER = ["tmp_files", "dirs", "other_files", "regular_files"]
 
 
@@ -110,7 +111,7 @@ def main():
     text: str = _get_shell_text(_get_shell_args())
     assert isinstance(text, str), "text must by of type string"
     head, text = _separate_header_from_text(text)
-    filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER)
+    filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER, LINE_FILTER_ORDER_FALLBACK)
     for fname, fval in FDATA.items():
         FDATA[fname]["data"] = _map_join(fval["cleaner"], fval["data"])
     output_list = filter(

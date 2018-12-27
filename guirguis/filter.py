@@ -4,14 +4,20 @@
 from typing import List, Callable, Dict
 
 
-def _condition_indexing(data: str, condition_list: dict, ordered_list):
+def _condition_indexing(data: str, fdict: dict, ordered_list, order_fallback="None"):
     """return indexed conditions"""
     for i in ordered_list:
-        if condition_list[i]["test"](data):
+        if fdict[i]["test"](data):
             return i
+    return order_fallback
 
 
-def filter_dict(input_list: List[str], fdict: Dict[str, dict], ordered_list: List[str]):
+def filter_dict(
+    input_list: List[str],
+    fdict: Dict[str, dict],
+    ordered_list: List[str],
+    order_fallback: str,
+):
     """Filters input array into a dictioary
 
     Rearanges a list of inputs into a dictionary based on
@@ -19,12 +25,13 @@ def filter_dict(input_list: List[str], fdict: Dict[str, dict], ordered_list: Lis
 
     Args:
         input_list: list of strings to be filtered.
-        list_of_filters: test functions
-    Returns:
-        A dictionary
+        fdict: file dictionary
+        ordered_list: list of items in order
     """
     for t in input_list:
-        fdict[_condition_indexing(t, fdict, ordered_list)]["data"].append(t)
+        fdict[_condition_indexing(t, fdict, ordered_list, order_fallback)][
+            "data"
+        ].append(t)
 
 
 def _condition_index(data, condition_list):
