@@ -101,19 +101,20 @@ FDATA = {
     },
 }
 
+LINE_FILTER_ORDER = ["tmp_files", "regular_files", "dirs", "other_files"]
+LINE_OUTPUT_ORDER = ["tmp_files", "dirs", "other_files", "regular_files"]
+
 
 def main():
     """display directory files and folders"""
     text: str = _get_shell_text(_get_shell_args())
     assert isinstance(text, str), "text must by of type string"
     head, text = _separate_header_from_text(text)
-    flist = ["tmp_files", "regular_files", "dirs", "other_files"]
-    filter_dict(text.splitlines(), FDATA, flist)
+    filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER)
     for fname, fval in FDATA.items():
         FDATA[fname]["data"] = _map_join(fval["cleaner"], fval["data"])
-    f_output_list = ["tmp_files", "dirs", "other_files", "regular_files"]
     output_list = filter(
-        lambda f: len(f) > 0, [FDATA[x]["data"] for x in f_output_list]
+        lambda f: len(f) > 0, [FDATA[x]["data"] for x in LINE_OUTPUT_ORDER]
     )
     print("\n".join(output_list))
     print(head)
