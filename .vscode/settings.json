@@ -1,9 +1,0 @@
-{
-  "python.linting.enabled": true,
-  "python.autoComplete.extraPaths": [
-    "${env:SPARK_HOME}/python",
-    "${env:SPARK_HOME}/python/pyspark"
-  ],
-  "editor.formatOnSave": true,
-  "python.linting.pylintEnabled": true,
-}
