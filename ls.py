@@ -6,7 +6,7 @@ from itertools import chain, compress, repeat
 
 import regex as re
 
-from guirguis.filter import filter_list
+from guirguis.filter import filter_dict
 
 COLOR_STOP = "[0m"
 
@@ -108,13 +108,7 @@ def main():
     assert isinstance(text, str), "text must by of type string"
     head, text = _separate_header_from_text(text)
     flist = ["tmp_files", "regular_files", "dirs", "other_files"]
-    [
-        FDATA["tmp_files"]["data"],
-        FDATA["regular_files"]["data"],
-        FDATA["dirs"]["data"],
-        FDATA["other_files"]["data"],
-        _,
-    ] = filter_list(text.splitlines(), [FDATA[x]["test"] for x in flist])
+    filter_dict(text.splitlines(), FDATA, flist)
     for fname, fval in FDATA.items():
         FDATA[fname]["data"] = _map_join(fval["cleaner"], fval["data"])
     f_output_list = ["tmp_files", "dirs", "other_files", "regular_files"]
