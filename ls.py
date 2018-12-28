@@ -2,13 +2,24 @@
 """display directory files and folders"""
 import subprocess
 import sys
-from itertools import chain, compress, repeat
+from itertools import *
 
 import regex as re
 
 from guirguis.filter import filter_dict
 
 COLOR_STOP = "[0m"
+
+
+def _groupes(iterable, n, fillvalue=None):
+    """Collect data into fixed-length chunks or blocks"""
+    # _groupes('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
+
+def _clean_map(clean_fun, text_list):
+    return map(clean_fun, text_list)
 
 
 def _map_join(clean_fun, text_list):
@@ -86,22 +97,39 @@ def _get_shell_text(shell_args) -> str:
     return subprocess.run(shell_args, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
 
+def _set_max_len(fdata):
+    for k, f in fdata.items():
+        fdata[k]["max_len"] = max(f["data"], key=len)
+
+
 FDATA = {
     "regular_files": {
         "cleaner": _file_cleaner(),
         "test": _regurlar_file_test,
         "data": [],
+        "max_len": -1,
     },
-    "tmp_files": {"cleaner": _clean_files_tmp, "test": _tmp_file_test, "data": []},
-    "dirs": {"cleaner": _clean_dirs, "test": _regurlar_dir_test, "data": []},
+    "tmp_files": {
+        "cleaner": _clean_files_tmp,
+        "test": _tmp_file_test,
+        "data": [],
+        "max_len": -1,
+    },
+    "dirs": {
+        "cleaner": _clean_dirs,
+        "test": _regurlar_dir_test,
+        "data": [],
+        "max_len": -1,
+    },
     "other_files": {
         "cleaner": _clean_other_files,
         "test": _other_file_test,
         "data": [],
+        "max_len": -1,
     },
 }
 
-LINE_FILTER_ORDER = ["tmp_files", "regular_files", "dirs",]
+LINE_FILTER_ORDER = ["tmp_files", "regular_files", "dirs"]
 LINE_FILTER_ORDER_FALLBACK = "other_files"
 LINE_OUTPUT_ORDER = ["tmp_files", "dirs", "other_files", "regular_files"]
 
@@ -113,11 +141,18 @@ def main():
     head, text = _separate_header_from_text(text)
     filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER, LINE_FILTER_ORDER_FALLBACK)
     for fname, fval in FDATA.items():
-        FDATA[fname]["data"] = _map_join(fval["cleaner"], fval["data"])
-    output_list = filter(
-        lambda f: len(f) > 0, [FDATA[x]["data"] for x in LINE_OUTPUT_ORDER]
-    )
+        if fval["data"] != []:
+            # FDATA[fname]["max_len"] = max(map(len, fval["data"]))
+            FDATA[fname]["max_len"] = max(map(len, fval["data"]))
+        else:
+            FDATA[fname]["max_len"] = 0
+        FDATA[fname]["data"] = _clean_map(fval["cleaner"], fval["data"])
+        # FDATA[fname]["data"] = _map_join(fval["cleaner"], fval["data"])
+    # output_list = [FDATA[x]["data"] for x in LINE_OUTPUT_ORDER]
+    output_list = chain(*[FDATA[x]["data"] for x in LINE_OUTPUT_ORDER])
+    # output_list = _groupes(output_list, 3, fillvalue="")
     print("\n".join(output_list))
+    # print("\n".join(filter(lambda x: x != "", output_list)))
     print(head)
 
 
