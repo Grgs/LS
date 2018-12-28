@@ -11,13 +11,6 @@ from guirguis.filter import filter_dict
 COLOR_STOP = "[0m"
 
 
-def _groupes(iterable, n, fillvalue=None):
-    """Collect data into fixed-length chunks or blocks"""
-    # _groupes('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-    args = [iter(iterable)] * n
-    return zip_longest(*args, fillvalue=fillvalue)
-
-
 def _clean_map(clean_fun, text_list):
     return map(clean_fun, text_list)
 
@@ -141,18 +134,13 @@ def main():
     head, text = _separate_header_from_text(text)
     filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER, LINE_FILTER_ORDER_FALLBACK)
     for fname, fval in FDATA.items():
-        if fval["data"] != []:
-            # FDATA[fname]["max_len"] = max(map(len, fval["data"]))
-            FDATA[fname]["max_len"] = max(map(len, fval["data"]))
-        else:
-            FDATA[fname]["max_len"] = 0
+        # if fval["data"] != []:
+        #     FDATA[fname]["max_len"] = max(map(len, fval["data"]))
+        # else:
+        #     FDATA[fname]["max_len"] = 0
         FDATA[fname]["data"] = _clean_map(fval["cleaner"], fval["data"])
-        # FDATA[fname]["data"] = _map_join(fval["cleaner"], fval["data"])
-    # output_list = [FDATA[x]["data"] for x in LINE_OUTPUT_ORDER]
     output_list = chain(*[FDATA[x]["data"] for x in LINE_OUTPUT_ORDER])
-    # output_list = _groupes(output_list, 3, fillvalue="")
     print("\n".join(output_list))
-    # print("\n".join(filter(lambda x: x != "", output_list)))
     print(head)
 
 
