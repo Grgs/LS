@@ -11,7 +11,16 @@ from guirguis.filter import filter_dict
 COLOR_STOP = "[0m"
 
 
-def _clean_map(clean_fun, text_list):
+# def _safe_max(input_blob):
+#     l = -1
+#     try:
+#         l = len(input_blob)
+#     except:
+#         l = 0
+#     return l
+
+
+def _combine_cleaned(clean_fun, text_list):
     return map(clean_fun, text_list)
 
 
@@ -134,11 +143,8 @@ def main():
     head, text = _separate_header_from_text(text)
     filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER, LINE_FILTER_ORDER_FALLBACK)
     for fname, fval in FDATA.items():
-        # if fval["data"] != []:
-        #     FDATA[fname]["max_len"] = max(map(len, fval["data"]))
-        # else:
-        #     FDATA[fname]["max_len"] = 0
-        FDATA[fname]["data"] = _clean_map(fval["cleaner"], fval["data"])
+        FDATA[fname]["data"] = _combine_cleaned(fval["cleaner"], fval["data"])
+        # FDATA[fname]["max_len"] = max(map(len, FDATA[fname]["data"]), default=0)
     output_list = chain(*[FDATA[x]["data"] for x in LINE_OUTPUT_ORDER])
     print("\n".join(output_list))
     print(head)
