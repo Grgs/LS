@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """display directory files and folders"""
+# import profile
 import subprocess
 import sys
 from itertools import chain, compress, repeat
@@ -10,6 +11,9 @@ import regex as re
 from guirguis.filter import filter_dict
 
 COLOR_STOP = "[0m"
+RE_COLOR = re.compile(r"\x1b\[0m|\x1b\[01;\d+m", flags=re.V1)
+RE_HIDDEN = re.compile(r"\s(\x1b\[\d+;\d+m)?\.", flags=re.V1)
+RE_SPACE = re.compile(r"\s+", flags=re.V1)
 
 
 def _combine_cleaned(clean_fun, text_list):
@@ -37,7 +41,7 @@ def _other_file_test(line: str) -> bool:
 
 
 def _split_start(line: str) -> List[str]:
-    return re.split(r"\s+", line, maxsplit=3)
+    return RE_SPACE.split(line, maxsplit=3)
 
 
 def _compress_start(chuncks: List[str], filter_select: List[int]):
@@ -66,7 +70,7 @@ def _clean_mnt_files(line: str) -> str:
 
 
 def _clean_files_tmp(line: str) -> str:
-    return re.sub(r"\x1b\[0m|\x1b\[01;\d+m", "", _clean_mnt_files(line))
+    return RE_COLOR.sub("", _clean_mnt_files(line))
 
 
 def _separate_header_from_text(text: str):
@@ -103,7 +107,7 @@ def _set_max_len(fdata):
 
 
 def _is_hidden(text: str):
-    return bool(re.search(r"\s(\x1b\[\d+;\d+m)?\.", text, flags=re.V1))
+    return bool(RE_HIDDEN.search(text))
 
 
 def _sort_dot(lines):
@@ -152,14 +156,11 @@ def main():
         FDATA[fname]["data"] = _sort_dot(
             _combine_cleaned(fval["cleaner"], fval["data"])
         )
-        # FDATA[fname]["data"] =   sorted()      FDATA[fname]["data"]
-        # FDATA[fname]["max_len"] = max(map(len, FDATA[fname]["data"]), default=0)
-        # sorted(FDATA[x]["data"], key=lambda s: " ." in s, reverse=True)
     output_list = chain(*[FDATA[x]["data"] for x in LINE_OUTPUT_ORDER])
-    # output_list = chain(*[_sort_dot(FDATA[x]["data"]) for x in LINE_OUTPUT_ORDER])
     print("\n".join(output_list))
     print(head)
 
 
 if __name__ == "__main__":
+    # profile.run("main()")
     main()
