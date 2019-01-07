@@ -57,7 +57,8 @@ def _clean_dirs(line: str) -> str:
 
 
 def _clean_regular_files(line: str) -> str:
-    return "{} {:>6} {}".format(*_split_compress_start(line, [1, 0]))[1:] + COLOR_STOP
+    return "{} {:>6} {}".format(
+        *_split_compress_start(line, [1, 0]))[1:] + COLOR_STOP
 
 
 def _clean_other_files(line: str) -> str:
@@ -82,11 +83,8 @@ def _separate_header_from_text(text: str):
 
 
 def _file_cleaner():
-    if (
-        subprocess.run(["pwd"], stdout=subprocess.PIPE)
-        .stdout.decode("utf-8")
-        .startswith("/mnt/")
-    ):
+    if (subprocess.run(["pwd"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+            .startswith("/mnt/")):
         return _clean_mnt_files
     return _clean_regular_files
 
@@ -98,7 +96,8 @@ def _get_shell_args():
 
 
 def _get_shell_text(shell_args) -> str:
-    return subprocess.run(shell_args, stdout=subprocess.PIPE).stdout.decode("utf-8")
+    return subprocess.run(
+        shell_args, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
 
 def _set_max_len(fdata):
@@ -151,11 +150,11 @@ def main():
     text: str = _get_shell_text(_get_shell_args())
     assert isinstance(text, str), "text must by of type string"
     head, text = _separate_header_from_text(text)
-    filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER, LINE_FILTER_ORDER_FALLBACK)
+    filter_dict(text.splitlines(), FDATA, LINE_FILTER_ORDER,
+                LINE_FILTER_ORDER_FALLBACK)
     for fname, fval in FDATA.items():
         FDATA[fname]["data"] = _sort_dot(
-            _combine_cleaned(fval["cleaner"], fval["data"])
-        )
+            _combine_cleaned(fval["cleaner"], fval["data"]))
     output_list = chain(*[FDATA[x]["data"] for x in LINE_OUTPUT_ORDER])
     print("\n".join(output_list))
     print(head)
