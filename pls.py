@@ -9,7 +9,7 @@ import math
 import typing as T
 
 
-class FSize(object):
+class FNums:
 
     def __init__(self, value):
         self.value = value
@@ -29,8 +29,28 @@ class FSize(object):
     def __hash__(self):
         return self.value
 
+
+class FSize(FNums):
+
     def __str__(self):
-        return _convert_size(self.value)
+        if self.value == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(self.value, 1024)))
+        p = math.pow(1024, i)
+        s = round(self.value / p, 2)
+        return '{}{}'.format(s, size_name[i])
+        # return _convert_size(self.value)
+
+
+class FTime(FNums):
+
+    def __init__(self, value, current_time=dt.now()):
+        self.current_time = current_time
+        return super().__init__(value)
+
+    def __str__(self):
+        return _format_time(self.value, self.current_time)
 
 
 def _split(test, data):
@@ -43,20 +63,10 @@ def _split(test, data):
     return o1, o2
 
 
-def _convert_size(size_bytes):
-    if size_bytes == 0:
-        return "0B"
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(math.floor(math.log(size_bytes, 1024)))
-    p = math.pow(1024, i)
-    s = round(size_bytes / p, 2)
-    return '{}{}'.format(s, size_name[i])
-
-
-def format_time(t, current_time=dt.now()):
+def _format_time(t, current_time=dt.now()):
     idate = dt.utcfromtimestamp(t)
-    # if idate.year != current_time.year:
-    #     return '{:%Y-%m}'.format(idate)
+    if idate.year != current_time.year:
+        return '{:%Y-%m}'.format(idate)
     if idate.month != current_time.month:
         return '{:%m-%d}'.format(idate)
     if idate.day != current_time.day:
@@ -71,15 +81,15 @@ def generate_line_file(e, stats, current_time=dt.now()):
     return {
         'name': e.name,
         'size': FSize(stats.st_size),
-        'access': format_time(stats.st_atime, current_time),
-        'modification': format_time(stats.st_mtime, current_time),
+        'access': _format_time(stats.st_atime, current_time),
+        'modification': _format_time(stats.st_mtime, current_time),
     }
 
 
 def generate_line_dir(e, stats, current_time=dt.now()):
     return {
         'name': e.name,
-        'access': format_time(stats.st_atime, current_time),
+        'access': _format_time(stats.st_atime, current_time),
     }
 
 
@@ -173,23 +183,22 @@ def main():
         DATA[x]['regular']['lines'] = DATA[x]['regular']['sort'](
             DATA[x]['regular']['lines'])
 
-        # DATA[x]['regular']['lines'] = DATA[x]['regular']['sort'](filter(
-        #     DATA[x]['regular']['test'], DATA[x]['lines']))
-    # LINES['regular_files'] = _sort(filter(_test_files, LINES['regular_files']))
-
-    # LINES['regular_files'] = sorted(
-    #     filter(_test_all, LINES['regular_files']),
-    #     key=lambda l: l['size'],
-    #     reverse=True)
-    # LINES['regular_files'] = sorted(
-    #     LINES['regular_files'], key=lambda l: l['size'], reverse=True)
-    # print(
-    #     tb(
-    #         zip_file_dirs(DATA['files']['other']['lines'],
-    #                       DATA['dirs']['other']['lines'])))
-    print(tb(zip_file_dirs(*[DATA[i]['other']['lines'] for i in DATA])))
-    print(tb(zip_file_dirs(*[DATA[i]['regular']['lines'] for i in DATA])))
+    print(
+        tb(zip_file_dirs(*[DATA[i]['other']['lines'] for i in DATA]),
+           tablefmt='github'))
+    print(
+        tb(zip_file_dirs(*[DATA[i]['regular']['lines'] for i in DATA]),
+           tablefmt='github'))
 
 
 if __name__ == "__main__":
     main()
+
+# def _convert_size(size_bytes):
+#     if size_bytes == 0:
+#         return "0B"
+#     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+#     i = int(math.floor(math.log(size_bytes, 1024)))
+#     p = math.pow(1024, i)
+#     s = round(size_bytes / p, 2)
+#     return '{}{}'.format(s, size_name[i])
