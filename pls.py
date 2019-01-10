@@ -7,90 +7,92 @@ from datetime import timedelta
 import math
 
 import typing as T
+from FNums import FSize, FTime
 
 
-class FNums:
+class FSystem:
 
-    def __init__(self, value):
-        self.value = value
+    def _split(test, data):
+        o1, o2 = [], []
+        for i in data:
+            if test(i):
+                o1.append(i)
+            else:
+                o2.append(i)
+        return o1, o2
 
-    def __eq__(self, other):
-        return self.value == other.value
-
-    def __le__(self, other):
-        return self.value <= other.value
-
-    def __lt__(self, other):
-        return self.value < other.value
-
-    def __gt__(self, other):
-        return self.value > other.value
-
-    def __hash__(self):
-        return self.value
-
-
-class FSize(FNums):
-
-    def __str__(self):
-        if self.value == 0:
-            return "0B"
-        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-        i = int(math.floor(math.log(self.value, 1024)))
-        p = math.pow(1024, i)
-        s = round(self.value / p, 2)
-        return '{}{}'.format(s, size_name[i])
-        # return _convert_size(self.value)
-
-
-class FTime(FNums):
-
-    def __init__(self, value, current_time=dt.now()):
+    def __init__(self, current_time):
+        self.lines = []
+        self.regular = []
+        self.other = []
         self.current_time = current_time
-        return super().__init__(value)
+        self.is_split = False
+
+    def _generate_line(self, e, stats):
+        pass
+
+    def _sort(self, lines):
+        pass
+
+    def __repr__(self):
+        return '<{!r}><{!r}>'.format(self.lines, self.current_time)
 
     def __str__(self):
-        return _format_time(self.value, self.current_time)
+        if (self.is_split):
+            return '\n'.join(
+                map(lambda x: tb(self._sort(x)), [self.other, self.regular]))
+        return tb(self._sort(self.lines))
+
+    def _test_dot(line):
+        return line['name'].startswith('.')
+
+    def _test_backup(line):
+        return line['name'].endswith('~')
+
+    def _test_underscore(line):
+        return line['name'].startswith('_')
+
+    def _test(self):
+        pass
+
+    def add(self, e, stats):
+        self.lines.append(self._generate_line(e, stats))
+
+    def split_lines(self):
+        self.regular, self.other = FSystem._split(self._test, self.lines)
+        self.is_split = True
 
 
-def _split(test, data):
-    o1, o2 = [], []
-    for i in data:
-        if test(i):
-            o1.append(i)
-        else:
-            o2.append(i)
-    return o1, o2
+class FFiles(FSystem):
+
+    def _generate_line(self, e, stats):
+        return {
+            'name': e.name,
+            'size': FSize(stats.st_size),
+            'access': FTime(stats.st_atime, self.current_time),
+            'modification': FTime(stats.st_mtime, self.current_time),
+        }
+
+    def _test(self, line):
+        return not any([FFiles._test_backup(line), FFiles._test_dot(line)])
+
+    def _sort(self, lines):
+        return sorted(lines, key=lambda l: l['size'], reverse=True)
 
 
-def _format_time(t, current_time=dt.now()):
-    idate = dt.utcfromtimestamp(t)
-    if idate.year != current_time.year:
-        return '{:%Y-%m}'.format(idate)
-    if idate.month != current_time.month:
-        return '{:%m-%d}'.format(idate)
-    if idate.day != current_time.day:
-        diffdate = idate - current_time
-        return '{0.days} {1:%H}'.format(diffdate, idate)
-    diffdate = current_time - idate
-    return '{0}'.format(diffdate // timedelta(hours=1))
-    # return '{0} {1}'.format(idate.day - current_time.hour, current_time.minute - idate.minute)
+class FDirs(FSystem):
 
+    def _generate_line(self, e, stats):
+        return {
+            'name': e.name,
+            'access': FTime(stats.st_atime, self.current_time),
+        }
 
-def generate_line_file(e, stats, current_time=dt.now()):
-    return {
-        'name': e.name,
-        'size': FSize(stats.st_size),
-        'access': _format_time(stats.st_atime, current_time),
-        'modification': _format_time(stats.st_mtime, current_time),
-    }
+    def _test(self, line):
+        return not any([FDirs._test_dot(line), FDirs._test_underscore(line)])
 
-
-def generate_line_dir(e, stats, current_time=dt.now()):
-    return {
-        'name': e.name,
-        'access': _format_time(stats.st_atime, current_time),
-    }
+    def _sort(self, lines):
+        return sorted(lines, key=lambda l: l['name'])
 
 
 def zip_file_dirs(line_dict1, line_dict2):
@@ -104,101 +106,21 @@ def zip_file_dirs(line_dict1, line_dict2):
     return output_lines
 
 
-def _sort_files(line_list):
-    return sorted(line_list, key=lambda l: l['size'], reverse=True)
-
-
-def _sort_dirs(line_list):
-    return sorted(line_list, key=lambda l: l['name'])
-
-
-def _test_dot(line):
-    return line['name'].startswith('.')
-
-
-def _test_backup(line):
-    return line['name'].endswith('~')
-
-
-def _test_underscore(line):
-    return line['name'].startswith('_')
-
-
-def _test_files(line):
-    return not any([_test_backup(line), _test_dot(line)])
-
-
-def _test_dirs(line):
-    return not any([_test_dot(line), _test_underscore(line)])
-
-
-DATA = {
-    'files': {
-        'add': generate_line_file,
-        'lines': [],
-        'regular': {
-            'test': _test_files,
-            'lines': [],
-            'sort': _sort_files,
-        },
-        'other': {
-            'lines': [],
-            'sort': _sort_files,
-        },
-    },
-    'dirs': {
-        'add': generate_line_dir,
-        'lines': [],
-        'regular': {
-            'test': _test_dirs,
-            'lines': [],
-            'sort': _sort_dirs,
-        },
-        'other': {
-            'lines': [],
-            'sort': _sort_dirs,
-        },
-    },
-}
-
-
-def fill_entries(e, stats, current_time=dt.now()):
-    if (e.is_file()):
-        DATA['files']['lines'].append(DATA['files']['add'](e, stats,
-                                                           current_time))
-    else:
-        DATA['dirs']['lines'].append(DATA['dirs']['add'](e, stats,
-                                                         current_time))
-
-
 def main():
     current_time = dt.now()
+    files = FFiles(current_time)
+    dirs = FDirs(current_time)
     with os.scandir('.') as osscandir:
         for e in osscandir:
-            stats = e.stat()
-            fill_entries(e, stats, current_time)
-    for x in DATA:
-        DATA[x]['regular']['lines'], DATA[x]['other']['lines'] = _split(
-            DATA[x]['regular']['test'], DATA[x]['lines'])
-        DATA[x]['regular']['lines'] = DATA[x]['regular']['sort'](
-            DATA[x]['regular']['lines'])
-
-    print(
-        tb(zip_file_dirs(*[DATA[i]['other']['lines'] for i in DATA]),
-           tablefmt='github'))
-    print(
-        tb(zip_file_dirs(*[DATA[i]['regular']['lines'] for i in DATA]),
-           tablefmt='github'))
+            if (e.is_file()):
+                files.add(e, e.stat())
+            else:
+                dirs.add(e, e.stat())
+    files.split_lines()
+    dirs.split_lines()
+    print(tb(zip_file_dirs(files.other, dirs.other), tablefmt='github'))
+    print(tb(zip_file_dirs(files.regular, dirs.regular), tablefmt='github'))
 
 
 if __name__ == "__main__":
     main()
-
-# def _convert_size(size_bytes):
-#     if size_bytes == 0:
-#         return "0B"
-#     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-#     i = int(math.floor(math.log(size_bytes, 1024)))
-#     p = math.pow(1024, i)
-#     s = round(size_bytes / p, 2)
-#     return '{}{}'.format(s, size_name[i])
