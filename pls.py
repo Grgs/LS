@@ -4,6 +4,7 @@ from itertools import zip_longest
 from tabulate import tabulate as tb
 from datetime import datetime as dt
 from datetime import timedelta
+from collections import namedtuple
 import math
 
 import typing as T
@@ -23,34 +24,31 @@ class FSystem:
 
     def __init__(self, current_time):
         self.lines = []
-        self.regular = []
-        self.other = []
+        self._regular = []
+        self._other = []
         self.current_time = current_time
         self.is_split = False
 
     def _generate_line(self, e, stats):
         pass
 
-    def _sort(self, lines):
-        pass
-
     def __repr__(self):
-        return '<{!r}><{!r}>'.format(self.lines, self.current_time)
+        return '<{!r}>{!r}'.format(self.current_time, self.lines)
 
     def __str__(self):
         if (self.is_split):
             return '\n'.join(
-                map(lambda x: tb(self._sort(x)), [self.other, self.regular]))
+                map(lambda x: tb(self._sort(x)), [self._other, self._regular]))
         return tb(self._sort(self.lines))
 
     def _test_dot(line):
-        return line['name'].startswith('.')
+        return line.name.startswith('.')
 
     def _test_backup(line):
-        return line['name'].endswith('~')
+        return line.name.endswith('~')
 
     def _test_underscore(line):
-        return line['name'].startswith('_')
+        return line.name.startswith('_')
 
     def _test(self):
         pass
@@ -59,51 +57,64 @@ class FSystem:
         self.lines.append(self._generate_line(e, stats))
 
     def split_lines(self):
-        self.regular, self.other = FSystem._split(self._test, self.lines)
+        self._regular, self._other = FSystem._split(self._test, self.lines)
         self.is_split = True
+
+    @property
+    def regular(self):
+        return self._sort(self._regular)
+
+    @property
+    def other(self):
+        return self._sort(self._other)
 
 
 class FFiles(FSystem):
 
+    def __init__(self, current_time):
+        self.Nline = namedtuple('Nline',
+                                ['name', 'size', 'accessed', 'modified'])
+        return super().__init__(current_time)
+
     def _generate_line(self, e, stats):
-        return {
-            'name': e.name,
-            'size': FSize(stats.st_size),
-            'access': FTime(stats.st_atime, self.current_time),
-            'modification': FTime(stats.st_mtime, self.current_time),
-        }
+        return self.Nline(
+            name=e.name,
+            size=FSize(stats.st_size),
+            accessed=FTime(stats.st_atime, self.current_time),
+            modified=FTime(stats.st_mtime, self.current_time),
+        )
 
     def _test(self, line):
         return not any([FFiles._test_backup(line), FFiles._test_dot(line)])
 
     def _sort(self, lines):
-        return sorted(lines, key=lambda l: l['size'], reverse=True)
+        return sorted(lines, key=lambda l: l.size, reverse=True)
 
 
 class FDirs(FSystem):
 
+    def __init__(self, current_time):
+        self.Nline = namedtuple('Nline', [
+            'name',
+            'accessed',
+        ])
+        return super().__init__(current_time)
+
     def _generate_line(self, e, stats):
-        return {
-            'name': e.name,
-            'access': FTime(stats.st_atime, self.current_time),
-        }
+        return self.Nline(
+            name=e.name,
+            accessed=FTime(stats.st_atime, self.current_time),
+        )
 
     def _test(self, line):
         return not any([FDirs._test_dot(line), FDirs._test_underscore(line)])
 
     def _sort(self, lines):
-        return sorted(lines, key=lambda l: l['name'])
+        return sorted(lines, key=lambda l: l.name)
 
 
-def zip_file_dirs(line_dict1, line_dict2):
-    if len(line_dict1) < len(line_dict2):
-        line_dict1, line_dict2 = line_dict2, line_dict1
-    output_lines = []
-    for f, d in zip_longest(line_dict1, line_dict2, fillvalue={}):
-        ol = list(f.values())
-        ol.extend(list(d.values()))
-        output_lines.append(ol)
-    return output_lines
+def _tabulate_splitline(lines):
+    return tb(lines, headers="keys", tablefmt='presto').splitlines()
 
 
 def main():
@@ -118,8 +129,11 @@ def main():
                 dirs.add(e, e.stat())
     files.split_lines()
     dirs.split_lines()
-    print(tb(zip_file_dirs(files.other, dirs.other), tablefmt='github'))
-    print(tb(zip_file_dirs(files.regular, dirs.regular), tablefmt='github'))
+    print(tb(zip_longest(*map(_tabulate_splitline, [files.other, dirs.other]))))
+    print(
+        tb(
+            zip_longest(
+                *map(_tabulate_splitline, [files.regular, dirs.regular]))))
 
 
 if __name__ == "__main__":
