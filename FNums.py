@@ -29,12 +29,13 @@ class FSize(FNums):
     def __str__(self):
         # modified from https://stackoverflow.com/a/14822210/7022271
         if self.value == 0:
-            return "0B"
-        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+            return '|{size: >6} B'.format(size=0)
+        size_name = (" B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
         i = int(math.floor(math.log(self.value, 1024)))
-        # p = math.pow(1024, i)
         size = round(self.value / math.pow(1024, i), 2)
-        return f'{size}{size_name[i]}'
+        return '|{size: >6}{size_name}'.format(
+            size=size, size_name=size_name[i])
+        # return f'{size}{size_name[i]}'
         # return '{size}{size_name[i]}'.format(size=size, size_name=size_name[i])
         # return _convert_size(self.value)
 
