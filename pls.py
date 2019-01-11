@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
+# import profile
+import math
 import os
-from itertools import zip_longest
-from tabulate import tabulate as tb
+import sys
+import typing as T
+from collections import namedtuple
 from datetime import datetime as dt
 from datetime import timedelta
-from collections import namedtuple
-import math
+from itertools import zip_longest
 
-import typing as T
+import tabulate as tb
+from tabulate import tabulate
+
 from FNums import FSize, FTime
 
 
@@ -38,8 +42,9 @@ class FSystem:
     def __str__(self):
         if (self.is_split):
             return '\n'.join(
-                map(lambda x: tb(self._sort(x)), [self._other, self._regular]))
-        return tb(self._sort(self.lines))
+                map(lambda x: tabulate(self._sort(x)),
+                    [self._other, self._regular]))
+        return tabulate(self._sort(self.lines))
 
     def _test_dot(line):
         return line.name.startswith('.')
@@ -73,7 +78,7 @@ class FFiles(FSystem):
 
     def __init__(self, current_time):
         self.Nline = namedtuple('Nline',
-                                ['name', 'size', 'accessed', 'modified'])
+                                ['name', 'size', 'modified', 'accessed'])
         return super().__init__(current_time)
 
     def _generate_line(self, e, stats):
@@ -96,14 +101,14 @@ class FDirs(FSystem):
     def __init__(self, current_time):
         self.Nline = namedtuple('Nline', [
             'name',
-            'accessed',
+            'modified',
         ])
         return super().__init__(current_time)
 
     def _generate_line(self, e, stats):
         return self.Nline(
             name=e.name,
-            accessed=FTime(stats.st_atime, self.current_time),
+            modified=FTime(stats.st_mtime, self.current_time),
         )
 
     def _test(self, line):
@@ -114,14 +119,17 @@ class FDirs(FSystem):
 
 
 def _tabulate_splitline(lines):
-    return tb(lines, headers="keys", tablefmt='presto').splitlines()
+    return tabulate(lines, headers="keys", tablefmt='presto').splitlines()
 
 
 def main():
     current_time = dt.now()
     files = FFiles(current_time)
     dirs = FDirs(current_time)
-    with os.scandir('.') as osscandir:
+    arg = '.'
+    if (len(sys.argv) > 1):
+        arg = sys.argv[1]
+    with os.scandir(arg) as osscandir:
         for e in osscandir:
             if (e.is_file()):
                 files.add(e, e.stat())
@@ -129,12 +137,15 @@ def main():
                 dirs.add(e, e.stat())
     files.split_lines()
     dirs.split_lines()
-    print(tb(zip_longest(*map(_tabulate_splitline, [files.other, dirs.other]))))
     print(
-        tb(
+        tabulate(
+            zip_longest(*map(_tabulate_splitline, [files.other, dirs.other]))))
+    print(
+        tabulate(
             zip_longest(
                 *map(_tabulate_splitline, [files.regular, dirs.regular]))))
 
 
 if __name__ == "__main__":
+    # profile.run("main()")
     main()
