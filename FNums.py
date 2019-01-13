@@ -7,6 +7,7 @@ class FNums:
 
     def __init__(self, value):
         self.value = value
+        self._stored_string = None
 
     def __eq__(self, other):
         return self.value == other.value
@@ -23,10 +24,18 @@ class FNums:
     def __hash__(self):
         return self.value
 
+    def __str__(self):
+        if self._stored_string is None:
+            self._stored_string = self._str()
+        return self._stored_string
+
+    def _str(self):
+        return str(self.value)
+
 
 class FSize(FNums):
 
-    def __str__(self):
+    def _str(self):
         # modified from https://stackoverflow.com/a/14822210/7022271
         if self.value == 0:
             return '|{size: >6} B'.format(size=0)
@@ -35,9 +44,6 @@ class FSize(FNums):
         size = round(self.value / math.pow(1024, i), 2)
         return '|{size: >6}{size_name}'.format(
             size=size, size_name=size_name[i])
-        # return f'{size}{size_name[i]}'
-        # return '{size}{size_name[i]}'.format(size=size, size_name=size_name[i])
-        # return _convert_size(self.value)
 
 
 class FTime(FNums):
@@ -45,15 +51,15 @@ class FTime(FNums):
     def __init__(self, value, current_time=dt.now()):
         self.current_time = current_time
         self.value_date = dt.utcfromtimestamp(value)
-        return super().__init__(value)
+        super().__init__(value)
 
-    def __str__(self):
+    def _str(self):
         if self.value_date.year != self.current_time.year:
             return '{:%Y-%m}'.format(self.value_date)
         if self.value_date.month != self.current_time.month:
             return '{:%m-%d}'.format(self.value_date)
         if self.value_date.day != self.current_time.day:
             diffdate = self.value_date - self.current_time
-            return '{0.days} {1:%H}'.format(diffdate, self.value_date)
+            return '{0.days}d {1:%H}h'.format(diffdate, self.value_date)
         diffdate = self.current_time - self.value_date
-        return '{0}'.format(diffdate // timedelta(hours=1))
+        return '{0}h'.format(diffdate // timedelta(hours=1))
