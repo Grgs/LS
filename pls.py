@@ -21,21 +21,10 @@ def _zip_tabulate(files, dirs, part: str):
             [getattr(files, part), getattr(dirs, part)])))
 
 
-# class FLine:
-
-#     def __init__(self, e, stats, current_time):
-#         self._line = [
-#             e.name,
-#             FSize(stats.st_size),
-#             FTime(stats.st_atime, current_time),
-#             FTime(stats.st_mtime, current_time),
-#         ]
-
-
 def main():
     current_time = dt.now()
-    files = FFiles(current_time)
-    dirs = FDirs(current_time)
+    files = FFiles('file', current_time)
+    dirs = FDirs('dir', current_time)
     arg = '.'
     if len(sys.argv) > 1:
         arg = sys.argv[1]
@@ -45,11 +34,33 @@ def main():
                 files.add(e, e.stat())
             else:
                 dirs.add(e, e.stat())
-    files.split_lines()
-    dirs.split_lines()
+    str_seperator = ('\n' + '-' * 60 + '\n')
+    print(
+        str_seperator.join(
+            map(str, [
+                dirs.other,
+                dirs.regular,
+                files.other,
+                files.regular,
+            ])))
 
-    for i in ['other', 'regular']:
-        print(_zip_tabulate(files, dirs, i))
+    # print('-' * 60)
+    # print('\n'.join(map(str, [
+    #     files.other,
+    #     files.regular,
+    # ])))
+
+    # print('\n'.join(map(str, [
+    #     dirs.other,
+    #     dirs.regular,
+    #     files.regular,
+    # ])))
+
+    # print('\n'.join(dirs.regular))
+
+    # print(files)
+    # for i in ['other', 'regular']:
+    #     print(_zip_tabulate(files, dirs, i))
 
 
 if __name__ == "__main__":

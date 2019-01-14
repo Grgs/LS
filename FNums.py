@@ -38,12 +38,11 @@ class FSize(FNums):
     def _str(self):
         # modified from https://stackoverflow.com/a/14822210/7022271
         if self.value == 0:
-            return '|{size: >6} B'.format(size=0)
-        size_name = (" B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+            return '{size: >6}B '.format(size=0)
+        size_name = ("B ", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
         i = int(math.floor(math.log(self.value, 1024)))
         size = round(self.value / math.pow(1024, i), 2)
-        return '|{size: >6}{size_name}'.format(
-            size=size, size_name=size_name[i])
+        return '{size: >6}{size_name}'.format(size=size, size_name=size_name[i])
 
 
 class FTime(FNums):
@@ -53,7 +52,7 @@ class FTime(FNums):
         self.value_date = dt.utcfromtimestamp(value)
         super().__init__(value)
 
-    def _str(self):
+    def _str_inner(self):
         if self.value_date.year != self.current_time.year:
             return '{:%Y-%m}'.format(self.value_date)
         if self.value_date.month != self.current_time.month:
@@ -62,4 +61,9 @@ class FTime(FNums):
             diffdate = self.value_date - self.current_time
             return '{0.days}d {1:%H}h'.format(diffdate, self.value_date)
         diffdate = self.current_time - self.value_date
-        return '{0}h'.format(diffdate // timedelta(hours=1))
+        return '{0}h {1}m'.format(
+            diffdate // timedelta(hours=1),
+            diffdate // timedelta(minutes=-60))
+
+    def _str(self):
+        return '{:<8}'.format(self._str_inner())
