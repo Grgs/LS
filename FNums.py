@@ -62,8 +62,8 @@ class FTime(FNums):
             return '{0.days}d {1:%H}h'.format(diffdate, self.value_date)
         diffdate = self.current_time - self.value_date
         return '{0}h {1}m'.format(
-            diffdate // timedelta(hours=1),
-            diffdate // timedelta(minutes=-60))
+            int(diffdate / timedelta(hours=1)),
+            diffdate.seconds % (60 * 60) // 60)
 
     def _str(self):
         return '{:<8}'.format(self._str_inner())
