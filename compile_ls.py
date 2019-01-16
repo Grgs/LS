@@ -2,4 +2,4 @@
 """compile ls.py"""
 import py_compile
 
-py_compile.compile("pls.py", cfile="cls.pyc", optimize=2)
+py_compile.compile("ls.py", cfile="cls.pyc", optimize=2)
