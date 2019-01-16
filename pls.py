@@ -3,6 +3,7 @@
 import os
 import sys
 from itertools import zip_longest
+from datetime import datetime as dt
 
 from tabulate import tabulate
 
@@ -21,8 +22,9 @@ def _zip_tabulate(files, dirs, part: str):
 
 
 def main():
-    files = FFiles('file')
-    dirs = FDirs('dir')
+    current_time = dt.now()
+    files = FFiles('file', current_time)
+    dirs = FDirs('dir', current_time)
     arg = '.'
     if len(sys.argv) > 1:
         arg = sys.argv[1]
@@ -35,12 +37,15 @@ def main():
     str_seperator = ('\n' + '-' * 60 + '\n')
     print(
         str_seperator.join(
-            map(str, [
-                dirs.other,
-                dirs.regular,
-                files.other,
-                files.regular,
-            ])))
+            filter(lambda x: x != '',
+                   map(str, [
+                       dirs.backup,
+                       files.backup,
+                       dirs.other,
+                       dirs.regular,
+                       files.other,
+                       files.regular,
+                   ]))))
 
 
 if __name__ == "__main__":

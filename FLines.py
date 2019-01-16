@@ -9,32 +9,25 @@ class FLine:
         self._stored_str = None
         self._max_name = 8
 
-    def get_str(self, name_max):
-        self._stored_str = ' '.join([
-            self._name.ljust(name_max, ' '),
-            ' '.join([str(f) for f in self._line])
-        ])
+    def get_str(self, max_name):
+        self._max_name = max_name
+        self._stored_str = self._str()
         return self._stored_str
 
     def _str(self):
-        if self._stored_str is None:
-            self._stored_str = ' '.join([
-                self._name.ljust(self._max_name, ' '),
-                ' '.join([str(f) for f in self._line])
-            ])
-        return self._stored_str
+        return ' '.join([
+            self._name.ljust(self._max_name, ' '),
+            ' '.join([str(f) for f in self._line])
+        ])
 
     def __str__(self):
         if self._stored_str is None:
             return self.get_str(self._max_name)
         return self._str()
 
-    def __len__(self):
-        return len(self._line)
-
     @property
     def max_name(self):
-        return self.max_name
+        return self._max_name
 
     @max_name.setter
     def max_name(self, max_name):
@@ -55,6 +48,9 @@ class FFileLine(FLine):
             FTime(stats.st_mtime, current_time),
         ]
 
+    def __len__(self):
+        return 3
+
     @property
     def size(self):
         return self._line[0]
@@ -68,6 +64,9 @@ class FDirLine(FLine):
             FTime(stats.st_mtime, current_time),
         ]
 
+    def __len__(self):
+        return 1
+
 
 class FLines:
 
@@ -75,14 +74,14 @@ class FLines:
         self._lines = []
         self._sort = sorter
         self._max_name = 8
-        # self._max_line = 8
+        self._max_line = 8
         self._index = 0
 
     def add(self, line):
         self._lines.append(line)
         if len(line.name) > self._max_name:
             self._max_name = len(line.name)
-            # self._max_line = self._max_name + len(line) * 7
+            self._max_line = self._max_name + len(line) * 8
 
     def __str__(self):
         return '\n'.join(
@@ -97,6 +96,10 @@ class FLines:
     def __getitem__(self, index):
         # return self._lines[index]
         return self._lines[index]
+
+    @property
+    def max_name(self):
+        return self._max_name
 
     # def max_line(self):
     #     return self._max_line

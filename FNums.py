@@ -57,13 +57,18 @@ class FTime(FNums):
             return '{:%Y-%m}'.format(self.value_date)
         if self.value_date.month != self.current_time.month:
             return '{:%m-%d}'.format(self.value_date)
-        if self.value_date.day != self.current_time.day:
-            diffdate = self.value_date - self.current_time
-            return '{0.days}d {1:%H}h'.format(diffdate, self.value_date)
         diffdate = self.current_time - self.value_date
-        return '{0}h {1}m'.format(
-            int(diffdate / timedelta(hours=1)),
-            diffdate.seconds % (60 * 60) // 60)
+        if self.value_date.day != self.current_time.day:
+        # if diffdate.days != 0:
+            return '{0:>2}d {1:>2}h'.format(
+                abs(diffdate.days), (diffdate - timedelta(days=diffdate.days))
+                // timedelta(hours=1))
+        if self.value_date.hour < self.current_time.hour:
+            return '{0:>2}h {1:>2}m'.format(
+                int(diffdate / timedelta(hours=1)),
+                diffdate.seconds % (60 * 60) // 60)
+        return '{0:>2}m {1:>2}s'.format(diffdate.seconds % (60 * 60) // 60,
+                                        diffdate.seconds % 60)
 
     def _str(self):
         return '{:<8}'.format(self._str_inner())

@@ -17,6 +17,7 @@ class FSystem:
 
     def __init__(self, line_type, current_time=dt.now()):
         self._regular = FLines(self._sort)
+        self._backup = FLines(self._sort)
         self._other = FLines(self._sort)
         self.current_time = current_time
         self.is_split = False
@@ -51,7 +52,9 @@ class FSystem:
 
     def add(self, e, stats):
         line = self.line_gen(e, stats, self.current_time)
-        if self._test(line):
+        if self._test_backup(line):
+            self._backup.add(line)
+        elif self._test(line):
             self._regular.add(line)
         else:
             self._other.add(line)
@@ -59,6 +62,10 @@ class FSystem:
     @property
     def regular(self):
         return self._regular
+
+    @property
+    def backup(self):
+        return self._backup
 
     @property
     def other(self):
@@ -69,7 +76,7 @@ class FFiles(FSystem):
 
     @classmethod
     def _test(cls, line):
-        return not any([cls._test_backup(line), cls._test_dot(line)])
+        return not cls._test_dot(line)
 
     @classmethod
     def _sort(cls, lines):
