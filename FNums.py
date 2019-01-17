@@ -59,7 +59,6 @@ class FTime(FNums):
             return '{:%m-%d}'.format(self.value_date)
         diffdate = self.current_time - self.value_date
         if self.value_date.day != self.current_time.day:
-        # if diffdate.days != 0:
             return '{0:>2}d {1:>2}h'.format(
                 abs(diffdate.days), (diffdate - timedelta(days=diffdate.days))
                 // timedelta(hours=1))
