@@ -1,26 +1,16 @@
 from datetime import datetime as dt
+from typing import *
 
 from FLines import FDirLine, FFileLine, FLines
 
 
 class FSystem:
 
-    @staticmethod
-    def _split(test, data):
-        o_1, o_2 = [], []
-        for i in data:
-            if test(i):
-                o_1.append(i)
-            else:
-                o_2.append(i)
-        return o_1, o_2
-
-    def __init__(self, line_type, current_time=dt.now()):
+    def __init__(self, line_type: str, current_time=dt.now()):
         self._regular = FLines(self._sort)
         self._backup = FLines(self._sort)
         self._other = FLines(self._sort)
         self.current_time = current_time
-        self.is_split = False
         self.line_gen = FFileLine if line_type == 'file' else FDirLine
 
     def __repr__(self):
@@ -59,6 +49,13 @@ class FSystem:
         else:
             self._other.add(line)
 
+    def complete(self):
+        for i in [self._regular, self._other, self._backup]:
+            i.complete()
+
+    def output(self):
+        return [self._backup, self._other, self._regular]
+
     @property
     def regular(self):
         return self._regular
@@ -70,6 +67,16 @@ class FSystem:
     @property
     def other(self):
         return self._other
+
+    # @staticmethod
+    # def _split(test, data):
+    #     o_1, o_2 = [], []
+    #     for i in data:
+    #         if test(i):
+    #             o_1.append(i)
+    #         else:
+    #             o_2.append(i)
+    #     return o_1, o_2
 
 
 class FFiles(FSystem):
