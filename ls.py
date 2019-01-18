@@ -8,6 +8,21 @@ from itertools import chain, islice, zip_longest
 from LsSystem import FDirs, FFiles
 
 
+def _get_entries(_path: str):
+    current_time = dt.now()
+    files = FFiles('file', current_time)
+    dirs = FDirs('dir', current_time)
+    with os.scandir(_path) as osscandir:
+        for e in osscandir:
+            if e.is_file():
+                files.add(e, e.stat())
+            else:
+                dirs.add(e, e.stat())
+    files.complete()
+    dirs.complete()
+    return files, dirs
+
+
 def _pack_entries(file_lists, dir_lists):
     dir_lists = list(filter(lambda l: l != [], dir_lists))
     file_lists = list(filter(lambda l: l != [], file_lists))
@@ -28,19 +43,24 @@ def _pack_entries(file_lists, dir_lists):
     return singles, doubles, last_singles
 
 
-def get_entries(_path: str):
-    current_time = dt.now()
-    files = FFiles('file', current_time)
-    dirs = FDirs('dir', current_time)
-    with os.scandir(_path) as osscandir:
-        for e in osscandir:
-            if e.is_file():
-                files.add(e, e.stat())
-            else:
-                dirs.add(e, e.stat())
-    files.complete()
-    dirs.complete()
-    return files, dirs
+def _generate_narrow(files, dirs):
+    section_seperator = '\n' + '-' * (os.get_terminal_size().columns - 1) + '\n'
+    output = dirs.output()
+    output.extend(files.output())
+    return section_seperator.join(
+        map(lambda x: '\n'.join(x.get_lines()), filter(lambda x: x, output)))
+
+
+def _generate_wide(files, dirs):
+    return '\n'.join(
+        list([
+            '{0:<52}|{1}'.format(*l) for l in zip_longest(
+                chain.from_iterable(
+                    map(lambda x: x.get_lines(), files.output())),
+                chain.from_iterable(
+                    map(lambda x: x.get_lines(), dirs.output())),
+                fillvalue=' ')
+        ]))
 
 
 def main():
@@ -48,30 +68,12 @@ def main():
         _path = sys.argv[1]
     else:
         _path = '.'
-    files, dirs = get_entries(_path)
+    files, dirs = _get_entries(_path)
 
-    if os.get_terminal_size().columns < 78:
-        section_seperator = '\n' + '-' * (
-            os.get_terminal_size().columns - 1) + '\n'
-        output = dirs.output()
-        output.extend(files.output())
-        text = section_seperator.join(
-            map(lambda x: '\n'.join(x.get_lines()), filter(lambda x: x,
-                                                           output)))
-    else:
-        text = '\n'.join(
-            list([
-                '{0:<52}|{1}'.format(*l) for l in zip_longest(
-                    chain.from_iterable(
-                        map(lambda x: x.get_lines(), files.output())),
-                    chain.from_iterable(
-                        map(lambda x: x.get_lines(), dirs.output())),
-                    fillvalue=' ')
-            ]))
-
-    print(text)
-
+    generate_text = _generate_wide if os.get_terminal_size(
+    ).columns > 77 else _generate_narrow
+    print(generate_text(files, dirs))
 
 if __name__ == "__main__":
-    # profile.run("main()")
+    # profile.run("pmain()")
     main()
