@@ -1,6 +1,7 @@
 import typing as T
+from itertools import compress
 
-from LsNums import FNums, FSize, FTime
+from LsNums import FSize, FTime
 
 
 class FLine:
@@ -9,7 +10,7 @@ class FLine:
         self.name: str = e.name
         self.stats = stats
         self.current_time = current_time
-        self._lnums: T.List[T.Type[FNums]] = []
+        self._lnums: T.List[T.Union[FSize, FTime]] = []
         self.max_name = 15
         self._line_len = 0
 
@@ -87,13 +88,31 @@ class FLines:
         self._max_line = 8
         self._index = 0
 
+    def _check_max(self, line):
+        local_max = len(line.name) + 1
+        if local_max > self._max_name:
+            self._max_name = local_max
+
     def add(self, line: TLine):
         self._lines.append(line)
-        if len(line.name) + 1 > self._max_name:
-            self._max_name = len(line.name) + 1
+        self._check_max(line)
 
     def get_line(self, index) -> str:
         return self._lines[index].get_str(self._max_name)
+
+    def _append_backup_to_line_name(self, index):
+        self._lines[index].name += '/~'
+        self._check_max(self._lines[index])
+
+    def find_and_mark_backup_line(self, f_in_line):
+        for i, fline in enumerate(self._lines, 0):
+            if f_in_line.name[:-1] == fline.name:
+                self._append_backup_to_line_name(i)
+                return True
+        return False
+
+    def delete_lines(self, compression_index):
+        self._lines = list(compress(self._lines, compression_index))
 
     def __str__(self) -> str:
         return '\n'.join(self.get_lines())
@@ -122,6 +141,9 @@ class FLines:
 
     def get_lines(self) -> T.List[str]:
         return [line.get_str(self._max_name) for line in self._lines]
+
+    def get_raw_lines(self) -> T.List[str]:
+        return self._lines
 
     @property
     def max_name(self):

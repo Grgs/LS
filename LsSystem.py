@@ -49,7 +49,17 @@ class FSystem:
         else:
             self._other.add(line)
 
+    def _get_lines_by_test(self, fline):
+        return self._other if self._test_dot(fline) else self._regular
+
     def complete(self):
+        list_compress = []
+        for fline in self._backup.get_raw_lines():
+            if self._get_lines_by_test(fline).find_and_mark_backup_line(fline):
+                list_compress.append(0)
+            else:
+                list_compress.append(1)
+        self._backup.delete_lines(list_compress)
         for i in [self._regular, self._other, self._backup]:
             i.complete()
 
