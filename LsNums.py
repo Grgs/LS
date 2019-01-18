@@ -54,7 +54,8 @@ class FTime(FNums):
         self.value_date = dt.utcfromtimestamp(value)
         super().__init__(value)
 
-    def _str_inner(self) -> str:
+
+    def _str(self) -> str:
         if self.value_date.year != self.current_time.year:
             return '{:%Y-%m}'.format(self.value_date)
         if self.value_date.month != self.current_time.month:
@@ -70,6 +71,3 @@ class FTime(FNums):
                 diffdate.seconds % (60 * 60) // 60)
         return '{0:>2}m {1:>2}s'.format(diffdate.seconds % (60 * 60) // 60,
                                         diffdate.seconds % 60)
-
-    def _str(self) -> str:
-        return '{:>8}'.format(self._str_inner())
