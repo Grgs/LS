@@ -2,33 +2,10 @@
 # import profile
 import os
 import sys
-from itertools import zip_longest, chain, islice
 from datetime import datetime as dt
+from itertools import chain, islice, zip_longest
 
-from tabulate import tabulate
-
-from FSystem import FDirs, FFiles
-
-
-def _tabulate_splitline(lines):
-    return tabulate(lines, headers="keys", tablefmt='presto').splitlines()
-
-
-def _zip_tabulate(files, dirs, part: str):
-    return tabulate(
-        zip_longest(*map(
-            _tabulate_splitline,
-            [getattr(files, part), getattr(dirs, part)])))
-
-
-def _fill_empty(line):
-    if line is None:
-        return ''
-    return str(line)
-
-
-def _entry_join(line):
-    return ' | '.join(map(_fill_empty, line))
+from LsSystem import FDirs, FFiles
 
 
 def _pack_entries(file_lists, dir_lists):

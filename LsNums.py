@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from datetime import timedelta
-import math
+
+import bitmath
 
 
 class FNums:
@@ -12,6 +13,9 @@ class FNums:
     def __eq__(self, other):
         return self.value == other.value
 
+    def __ne__(self, other):
+        return self.value != other.value
+
     def __le__(self, other):
         return self.value <= other.value
 
@@ -21,6 +25,9 @@ class FNums:
     def __gt__(self, other):
         return self.value > other.value
 
+    def __ge__(self, other):
+        return self.value >= other.value
+
     def __hash__(self):
         return self.value
 
@@ -29,20 +36,15 @@ class FNums:
             self._stored_string = self._str()
         return self._stored_string
 
-    def _str(self):
+    def _str(self) -> str:
         return str(self.value)
 
 
 class FSize(FNums):
 
-    def _str(self):
-        # modified from https://stackoverflow.com/a/14822210/7022271
-        if self.value == 0:
-            return '{size: >6}B '.format(size=0)
-        size_name = ("B ", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-        i = int(math.floor(math.log(self.value, 1024)))
-        size = round(self.value / math.pow(1024, i), 2)
-        return '{size: >6}{size_name}'.format(size=size, size_name=size_name[i])
+    def _str(self) -> str:
+        value = bitmath.Byte(self.value).best_prefix()
+        return '{0:>6.1f}{1}'.format(value.value, value.unit[0])
 
 
 class FTime(FNums):
@@ -52,7 +54,7 @@ class FTime(FNums):
         self.value_date = dt.utcfromtimestamp(value)
         super().__init__(value)
 
-    def _str_inner(self):
+    def _str_inner(self) -> str:
         if self.value_date.year != self.current_time.year:
             return '{:%Y-%m}'.format(self.value_date)
         if self.value_date.month != self.current_time.month:
@@ -69,5 +71,5 @@ class FTime(FNums):
         return '{0:>2}m {1:>2}s'.format(diffdate.seconds % (60 * 60) // 60,
                                         diffdate.seconds % 60)
 
-    def _str(self):
-        return '{:<8}'.format(self._str_inner())
+    def _str(self) -> str:
+        return '{:>8}'.format(self._str_inner())

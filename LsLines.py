@@ -1,6 +1,6 @@
 import typing as T
 
-from FNums import FNums, FSize, FTime
+from LsNums import FNums, FSize, FTime
 
 
 class FLine:
@@ -26,8 +26,8 @@ class FLine:
         return self._str()
 
     def get_str(self, max_name: int):
-        return self.name.ljust(max_name, ' ') + ' '.join(
-            [str(f) for f in self._lnums])
+        return self.name.ljust(
+            max_name, fillchar=' ') + ' '.join([str(f) for f in self._lnums])
 
     def get_empty(self, max_name: int = None):
         if max_name is None:
@@ -53,6 +53,10 @@ class FFileLine(FLine):
     def __len__(self):
         return 3
 
+    def get_str(self, max_name: int):
+        return str.ljust(self.name, max_name, ' ') + ' '.join(
+            [str(f) for f in self._lnums])
+
 
 class FDirLine(FLine):
 
@@ -66,15 +70,18 @@ class FDirLine(FLine):
     def __len__(self):
         return 1
 
+    def get_str(self, max_name: int):
+        return str.ljust(self.name, max_name, ' ') + str(self._lnums[0])
+
 
 TLine = T.Type[FLine]
 TLineList = T.List[TLine]
 
 
-class FLineList:
+class FLines:
 
     def __init__(self, sorter: T.Callable[[TLineList], TLineList]):
-        self._lines: TLineList = []
+        self._lines: T.List = []
         self._sort = sorter
         self._max_name = 15
         self._max_line = 8
@@ -123,11 +130,8 @@ class FLineList:
     @max_name.setter
     def max_name(self, max_name: int):
         self._max_name = max_name
-        self._max_line = max_name + len(self._lines[0]) * 8  # type: ignore
+        self._max_line = max_name + len(self._lines[0]) * 8
 
     @property
     def max_line(self):
         return self._max_line
-
-    # def empty(self):
-    #     return ' ' * self._max_line

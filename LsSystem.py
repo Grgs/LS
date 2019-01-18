@@ -1,15 +1,15 @@
 from datetime import datetime as dt
 from typing import *
 
-from FLines import FDirLine, FFileLine, FLineList
+from LsLines import FDirLine, FFileLine, FLines
 
 
 class FSystem:
 
     def __init__(self, line_type: str, current_time=dt.now()):
-        self._regular = FLineList(self._sort)
-        self._backup = FLineList(self._sort)
-        self._other = FLineList(self._sort)
+        self._regular = FLines(self._sort)
+        self._backup = FLines(self._sort)
+        self._other = FLines(self._sort)
         self.current_time = current_time
         self.line_gen = FFileLine if line_type == 'file' else FDirLine
 
