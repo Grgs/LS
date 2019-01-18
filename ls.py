@@ -72,57 +72,27 @@ def main():
     else:
         _path = '.'
     files, dirs = get_entries(_path)
-    # section_seperator = ('-' * os.get_terminal_size().columns)
-    # str_seperator = ('\n' + '-' * 60 + '\n')
-    # print(
-    #     str_seperator.join(
-    #         filter(lambda x: x != '',
-    #                map(str, [
-    #                    dirs.backup,
-    #                    files.backup,
-    #                    dirs.other,
-    #                    dirs.regular,
-    #                    files.other,
-    #                    files.regular,
-    #                ]))))
 
-    # singles, doubles, last_singles = _pack_entries(
-    #         map(lambda x: x.get_lines(), files.output()),
-    #         map(lambda x: x.get_lines(), dirs.output()))
-    # print('\n'.join(map(str, singles)))
-    # print(section_seperator)
-    # for i in doubles:
-    #     print(' '.join(map(str, i)))
+    if os.get_terminal_size().columns < 78:
+        section_seperator = '\n' + '-' * (
+            os.get_terminal_size().columns - 1) + '\n'
+        output = dirs.output()
+        output.extend(files.output())
+        text = section_seperator.join(
+            map(lambda x: '\n'.join(x.get_lines()), filter(lambda x: x,
+                                                           output)))
+    else:
+        text = '\n'.join(
+            list([
+                '{0:<52}|{1}'.format(*l) for l in zip_longest(
+                    chain.from_iterable(
+                        map(lambda x: x.get_lines(), files.output())),
+                    chain.from_iterable(
+                        map(lambda x: x.get_lines(), dirs.output())),
+                    fillvalue=' ')
+            ]))
 
-    # print('\n'.join(map(str, last_singles)))
-
-    print('\n'.join(
-        list([
-            ' | '.join(l) for l in zip_longest(
-                chain.from_iterable(
-                    map(lambda x: x.get_lines(), files.output())),
-                chain.from_iterable(
-                    map(lambda x: x.get_lines(), dirs.output())),
-                fillvalue=' ' * 50)
-        ])))
-
-    # print('\n'.join(
-    #     map(_entry_join,
-    #         zip_longest(
-    #             chain(*map(lambda x: x.get_lines(), [
-    #                 files.backup,
-    #                 files.other,
-    #                 files.regular,
-    #             ])),
-    #             chain(*map(lambda x: x.get_lines(), [
-    #                 dirs.backup,
-    #                 dirs.other,
-    #                 dirs.regular,
-    #             ]))))))
-
-    # print('\n'.join(
-    #     map(_entry_join,
-    #         zip_longest(files.other.get_lines(), dirs.regular.get_lines()))))
+    print(text)
 
 
 if __name__ == "__main__":
