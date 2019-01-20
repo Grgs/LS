@@ -1,101 +1,89 @@
-from datetime import datetime as dt
-from typing import *
+# from typing import *
 
-from LsLines import FDirLine, FFileLine, FLines
-
-
-class FSystem:
-
-    def __init__(self, line_type: str, current_time=dt.now()):
-        self._regular = FLines(self._sort)
-        self._backup = FLines(self._sort)
-        self._other = FLines(self._sort)
-        self.current_time = current_time
-        self.line_gen = FFileLine if line_type == 'file' else FDirLine
-
-    def __repr__(self):
-        return '<{!r}>{!r} \n{!r}'.format(self.current_time, self._regular,
-                                          self._other)
-
-    def __str__(self):
-        return '\n'.join(map(str, [self._other, self._regular]))
-
-    @staticmethod
-    def _test_dot(line):
-        return line.name.startswith('.')
-
-    @staticmethod
-    def _test_backup(line):
-        return line.name.endswith('~')
-
-    @staticmethod
-    def _test_underscore(line):
-        return line.name.startswith('_')
-
-    @classmethod
-    def _test(cls, line):
-        pass
-
-    @classmethod
-    def _sort(cls, lines):
-        return sorted(lines, key=lambda l: l.name, reverse=True)
-
-    def add(self, e, stats):
-        line = self.line_gen(e, stats, self.current_time)
-        if self._test_backup(line):
-            self._backup.add(line)
-        elif self._test(line):
-            self._regular.add(line)
-        else:
-            self._other.add(line)
-
-    def _get_lines_by_test(self, fline):
-        return self._other if self._test_dot(fline) else self._regular
-
-    def complete(self):
-        list_compress = []
-        for fline in self._backup.get_raw_lines():
-            if self._get_lines_by_test(fline).find_and_mark_backup_line(fline):
-                list_compress.append(0)
-            else:
-                list_compress.append(1)
-        self._backup.delete_lines(list_compress)
-        for i in [self._regular, self._other, self._backup]:
-            i.complete()
-
-    def output(self):
-        return [self._backup, self._other, self._regular]
-
-    @property
-    def regular(self):
-        return self._regular
-
-    @property
-    def backup(self):
-        return self._backup
-
-    @property
-    def other(self):
-        return self._other
+# from LsLines import DirLines, FileLines
+# from itertools import chain
 
 
-class FFiles(FSystem):
+# class FSystem:
 
-    @classmethod
-    def _test(cls, line):
-        return not cls._test_dot(line)
+#     def __init__(self):
+#         self._file_lines = FileLines()
+#         self._dir_lines = DirLines()
 
-    @classmethod
-    def _sort(cls, lines):
-        return sorted(lines, key=lambda l: l.size, reverse=True)
+#     def __repr__(self):
+#         return '{!r} \n{!r}'.format(self._file_lines, self._dir_lines)
+
+#     def __str__(self):
+#         return '\n'.join(chain.from_iterable([self._file_lines.get_lines(), self._dir_lines.get_lines()])
+
+#     @classmethod
+#     def _test(cls, line):
+#         pass
+
+#     def add(self, e, stats):
+#         if e.is_file():
+#             self._file_lines.add(e, stats)
+#         else:
+#             self._dir_lines.add(e, stats)
+
+#     def complete(self):
+#         # list_compress = []
+#         # for fline in self._lines.get_raw_lines():
+#         #     if fline.is_backup:
+#         #         if self._lines.mark_backup_line(fline):
+#         #             list_compress.append(0)
+#         #         else:
+#         #             list_compress.append(1)
+#         #     else:
+#         #         list_compress.append(1)
+#         # self._lines.delete_lines(list_compress)
+#         self._file_lines.complete()
+#         self._dir_lines.complete()
+
+# def _pack_entries(file_lists, dir_lists):
+#     dir_lists = list(filter(lambda l: l != [], dir_lists))
+#     file_lists = list(filter(lambda l: l != [], file_lists))
+#     f_list = list(chain(*file_lists))
+#     d_index, d_list = 0, []
+#     for i in dir_lists:
+#         if len(f_list) > (len(d_list) + len(i)):
+#             d_list.extend(i)
+#         else:
+#             break
+#         d_index += 1
+#     singles = chain(*dir_lists[d_index:])
+#     doubles = zip(f_list, d_list)
+#     if len(f_list) != len(d_list):
+#         last_singles = islice(f_list, len(d_list), None)
+#     else:
+#         last_singles = []
+#     return singles, doubles, last_singles
+
+# def _generate_narrow(files, dirs):
+#     section_seperator = '\n' + '-' * (os.get_terminal_size().columns - 1) + '\n'
+#     output = dirs.output()
+#     output.extend(files.output())
+#     return section_seperator.join(
+#         map(lambda x: '\n'.join(x.get_lines()), filter(lambda x: x, output)))
+
+# def _generate_wide(files, dirs):
+#     return '\n'.join(
+#         list([
+#             '{0:<52}|{1}'.format(*l) for l in zip_longest(
+#                 chain.from_iterable(
+#                     map(lambda x: x.get_lines(), files.output())),
+#                 chain.from_iterable(
+#                     map(lambda x: x.get_lines(), dirs.output())),
+#                 fillvalue=' ')
+#         ]))
+
+# def generate_text(files, dirs):
+#     return '\n'.join([str(l) for l in [dirs, files]])
 
 
-class FDirs(FSystem):
 
-    @classmethod
-    def _test(cls, line):
-        return not any([cls._test_dot(line), cls._test_underscore(line)])
+    # files, dirs = _get_entries(_path)
 
-    @classmethod
-    def _sort(cls, lines):
-        return sorted(lines, key=lambda l: l.name)
+    # # generate_text = _generate_wide if os.get_terminal_size(
+    # # ).columns > 77 else _generate_narrow
+    # print(generate_text(files, dirs))
