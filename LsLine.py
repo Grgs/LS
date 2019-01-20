@@ -23,7 +23,7 @@ class FLine:
         self.current_time = current_time
         self._lnums: T.List[T.Union[FSize, FTime]] = []
         self.max_name = 15
-        self._line_len = 0
+        self.line_len = 0
         self.is_hidden = self._test_dot(self.name)
         self.is_backup = self._test_tilda(self.name)
         self.is_cache = self._test_underscore(self.name)
@@ -70,7 +70,7 @@ class FLine:
         return self._str()
 
     def __len__(self):
-        return self._line_len
+        return self.line_len
 
     def __str__(self):
         return self._str()
@@ -98,7 +98,7 @@ class FFileLine(FLine):
             FTime(stats.st_atime, current_time),
             FTime(stats.st_mtime, current_time),
         ]
-        self._line_len = 3
+        self.line_len = 3
         self.sort_by = -1 * self.size
 
     def __len__(self):
@@ -116,7 +116,7 @@ class FDirLine(FLine):
         self._lnums = [
             FTime(stats.st_mtime, current_time),
         ]
-        self._line_len = 1
+        self.line_len = 1
         self.sort_by = self.name
 
     def __len__(self):
