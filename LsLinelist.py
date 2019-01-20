@@ -29,7 +29,6 @@ class FLines:
         self._lines.append(line)
         self._check_max(line)
 
-
     def _append_backup_to_line_name(self, index):
         self._lines[index].name += '/~'
         self._check_max(self._lines[index])
@@ -53,21 +52,17 @@ class FLines:
     def __getitem__(self, key: int):
         return self._lines[key]
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        for i in self._lines:
-            yield i
-
     def _set_max_line(self, max_name: int, line_len: int, field_size=8):
         self._max_line = max_name + line_len * field_size
 
     def complete(self):
         if self._lines != []:
-            last_line = self._lines[-1]
-            self._set_max_line(last_line.max_name, len(last_line))
+            # last_line = self._lines[-1]
+            self._set_max_line(self.max_name, len(self._lines[0]))
             self._lines = sorted(self._lines)
+
+    def get_empty_line(self):
+        return ' ' * (self._max_line)
 
     def get_lines(self) -> T.List[str]:
         return [line.get_str(self._max_name) for line in self._lines]
@@ -88,12 +83,16 @@ class FLines:
     def max_line(self):
         return self._max_line
 
+
 class FileLines(FLines):
+
     def __init__(self):
         super().__init__()
         self._line_generator = FFileLine
 
+
 class DirLines(FLines):
+
     def __init__(self):
         super().__init__()
         self._line_generator = FDirLine

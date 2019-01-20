@@ -2,7 +2,7 @@
 # import profile
 import os
 import sys
-from itertools import chain
+from itertools import chain, zip_longest
 from typing import *
 
 from LsLinelist import DirLines, FileLines
@@ -43,6 +43,19 @@ class FSystem:
         self._file_lines.complete()
         self._dir_lines.complete()
 
+    def _add_empty_start(self, line: str):
+        empty = self._file_lines.get_empty_line()
+        return empty + line[2:] if line.startswith('  ') else line
+
+    def print_lines(self):
+        line_gen = list(
+            zip_longest(
+                self._file_lines.get_lines(),
+                self._dir_lines.get_lines(),
+                fillvalue=' '))
+        text = list(map(self._add_empty_start, map(' | '.join, line_gen)))
+        return '\n'.join(text)
+
 
 def _get_entries(_path: str):
     entries = FSystem()
@@ -58,7 +71,7 @@ def main():
         _path = sys.argv[1]
     else:
         _path = '.'
-    print(_get_entries(_path))
+    print(_get_entries(_path).print_lines())
 
 
 if __name__ == "__main__":
