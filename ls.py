@@ -68,10 +68,19 @@ def _get_entries(_path: str):
 
 def main():
     if len(sys.argv) > 1:
-        _path = sys.argv[1]
+        _paths = [os.path.normpath(i) for i in sys.argv[1:]]
+        if not all(map(os.path.exists, _paths)):
+            print('Error: invalid path(s)')
+            sys.exit(1)
+        _paths = [i for i in _paths if os.path.isdir(i)]
+        if _paths == []:
+            print('Error: no path that is a directory')
+            sys.exit(1)
     else:
-        _path = '.'
-    print(_get_entries(_path).print_lines())
+        _paths = ['.']
+    for _path in _paths:
+        print(os.path.realpath(_path))
+        print(_get_entries(_path).print_lines())
 
 
 if __name__ == "__main__":
