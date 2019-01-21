@@ -47,14 +47,10 @@ class FLine:
         return self.type <= other.type
 
     def __eq__(self, other):
-        if self.type == other.type:
-            return self.sort_by == other.sort_by
-        return False
+        return self.type == other.type and self.sort_by == other.sort_by
 
     def __ne__(self, other):
-        if self.type == other.type:
-            return self.sort_by != other.sort_by
-        return self.type != other.type
+        return self.type != other.type or self.sort_by != other.sort_by
 
     def __ge__(self, other):
         if self.type == other.type:
