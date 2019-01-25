@@ -27,7 +27,7 @@ class FLine:
         self.is_hidden = self._test_dot(self.name)
         self.is_backup = self._test_tilda(self.name)
         self.is_cache = self._test_underscore(self.name)
-        self.type = self.is_backup * -100 + self.is_cache * -10 + self.is_hidden * -1
+        self.type = self.is_backup * -4 + self.is_cache * -2 + self.is_hidden * -1
         self.sort_by = None
 
     def _str(self) -> str:
@@ -91,14 +91,14 @@ class FFileLine(FLine):
         super().__init__(e, stats, current_time)
         self._lnums = [
             FSize(stats.st_size),
-            FTime(stats.st_atime, current_time),
+            # FTime(stats.st_atime, current_time),
             FTime(stats.st_mtime, current_time),
         ]
-        self.line_len = 3
+        self.line_len = len(self._lnums)
         self.sort_by = -1 * self.size
 
     def __len__(self):
-        return 3
+        return len(self._lnums)
 
     def get_str(self, max_name: int):
         return str.ljust(self.name, max_name, ' ') + ' '.join(
