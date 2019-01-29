@@ -1,7 +1,8 @@
 from datetime import datetime as dt
-# import regex as re
 
-import bitmath
+import humanize
+
+# import regex as re
 
 
 class FField:
@@ -39,31 +40,34 @@ class FField:
     def _str(self) -> str:
         return str(self.value)
 
-# class FName(FField):
 
-#     def __init__(self, value):
-#         super().__init__(value)
-#         if len(self.value) < 2:
-#             self._first_char = self.value
-#             self._pieces = []
-#             self.base = self.value
-#             self.extentions = []
-#         else:
-#             self._first_char = self.value[0]
-#             self._pieces = self.value[1:].split('.')
-#             self.base = self._first_char + self._pieces[0]
-#             self.extentions = []
-#             if len(self._pieces) > 1:
-#                 self.extentions = self._pieces[1:]
+class FName(FField):
 
-#     def _str(self) -> str:
-#         return self.value
+    def __init__(self, value):
+        super().__init__(value)
+        if len(self.value) < 2:
+            self._first_char = self.value
+            self._pieces = []
+            self.base = self.value
+            self.extentions = []
+        else:
+            self._first_char = self.value[0]
+            self._pieces = self.value[1:].split('.')
+            self.base = self._first_char + self._pieces[0]
+            self.extentions = []
+            if len(self._pieces) > 1:
+                self.extentions = self._pieces[1:]
+
+    def _str(self) -> str:
+        return self.value
+
 
 class FSize(FField):
 
     def _str(self) -> str:
-        value = bitmath.Byte(self.value).best_prefix()
-        return '{0:>6.1f}{1}'.format(value.value, value.unit[0])
+        return '{:>8}'.format(humanize.naturalsize(self.value, gnu=True))
+        # value = bitmath.Byte(self.value).best_prefix()
+        # return '{0:>6.1f}{1}'.format(value.value, value.unit[0])
 
 
 class FTime(FField):
