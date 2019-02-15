@@ -1,9 +1,8 @@
 import typing as T
+from datetime import datetime as dt
 from itertools import compress
 
-from datetime import datetime as dt
-
-from LsLine import FLine, FFileLine, FDirLine
+from LsLine import FDirLine, FFileLine, FLine
 
 TLine = T.Type[FLine]
 TLineList = T.List[TLine]
