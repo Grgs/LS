@@ -1,7 +1,9 @@
 /__pycache__/**
 /.mypy_cache/**
 /.vscode/**
+/htmlcov
 *~
 *.pyc
 guirguis/__pycache__/**
 tags
+.*
