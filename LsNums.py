@@ -2,8 +2,6 @@ from datetime import datetime as dt
 
 import humanize
 
-# import regex as re
-
 
 class FField:
 
@@ -43,6 +41,18 @@ class FField:
 
 class FName(FField):
 
+    @staticmethod
+    def _test_dot(name):
+        return name.startswith('.')
+
+    @staticmethod
+    def _test_tilda(name):
+        return name.endswith('~')
+
+    @staticmethod
+    def _test_underscore(name):
+        return name.startswith('_')
+
     def __init__(self, value):
         super().__init__(value)
         if len(self.value) < 2:
@@ -57,6 +67,12 @@ class FName(FField):
             self.extentions = []
             if len(self._pieces) > 1:
                 self.extentions = self._pieces[1:]
+        self.is_hidden = self._test_dot(self.value)
+        self.is_backup = self._test_tilda(self.value)
+        self.is_cache = self._test_underscore(self.value)
+        self.type = self.is_backup * -4 + self.is_cache * -2 + self.is_hidden * -1
+        self.to_delete = False
+
 
     def _str(self) -> str:
         return self.value
@@ -80,9 +96,9 @@ class FTime(FField):
     def _str(self) -> str:
         if self.value_date.year != self.current_time.year:
             return '{:%Y-%m}'.format(self.value_date)
-        if self.value_date.month != self.current_time.month:
-            return '{:%m-%d}'.format(self.value_date)
         diffdate = abs(self.current_time - self.value_date)
+        if diffdate.days >= 30:
+            return '{:%mm-%dd}'.format(self.value_date)
         diffhours = (diffdate.seconds // 3600) % 24
         if diffdate.days != 0:
             return '{0:>2}d {1:>2}h'.format(diffdate.days, diffhours)
