@@ -1,6 +1,6 @@
 import typing as T
 
-from LsNums import FSize, FTime
+from ls.LsNums import FSize, FTime
 
 
 class FLine:

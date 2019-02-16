@@ -1,5 +1,5 @@
 import unittest
-import LsNums
+from ls import LsNums
 
 
 class FFieldTest(unittest.TestCase):
