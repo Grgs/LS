@@ -1,16 +1,17 @@
 import unittest
-from ls import LsNums
+import Nums
+from datetime import datetime as dt
 
 
 class FFieldTest(unittest.TestCase):
 
     def setUp(self):
-        self.fourty_two = LsNums.FField(42)
-        self.another_fourty_two = LsNums.FField(42)
-        self.fourty_one = LsNums.FField(41)
+        self.fourty_two = Nums.FField(42)
+        self.another_fourty_two = Nums.FField(42)
+        self.fourty_one = Nums.FField(41)
 
     def test_equals_zero(self):
-        ffield = LsNums.FField(0)
+        ffield = Nums.FField(0)
         self.assertEqual(ffield.value, 0)
 
     def test_equals_correctly(self):
@@ -24,6 +25,17 @@ class FFieldTest(unittest.TestCase):
     def test_lessthan_correctly(self):
         self.assertTrue(self.fourty_one < self.fourty_two)
 
+    def test_morethan_correctly(self):
+        self.assertTrue(self.fourty_two > self.fourty_one)
+
+    def test_morethan_equal_correctly(self):
+        self.assertTrue(self.fourty_two >= self.fourty_one)
+        self.assertTrue(self.fourty_two >= self.another_fourty_two)
+
+    def test_lessthan_equal_correctly(self):
+        self.assertTrue(self.fourty_one <= self.fourty_two)
+        self.assertTrue(self.fourty_two <= self.another_fourty_two)
+
     def test_string(self):
         self.assertEqual(str(self.fourty_two), '42')
 
@@ -31,5 +43,32 @@ class FFieldTest(unittest.TestCase):
 class FSizeTest(unittest.TestCase):
 
     def test_equals_zero(self):
-        fsize = LsNums.FSize(0)
-        self.assertEqual(fsize.value, 0)
+        fsize = Nums.FSize(0)
+        self.assertRegex(str(fsize), ' *0B')
+        # assert str(fsize).endswith(' 0B')
+
+    def test_equals_zero(self):
+        fsize = Nums.FSize(1024)
+        self.assertRegex(str(fsize), ' *1\.0K')
+
+
+class FTimeTest(unittest.TestCase):
+
+    def setUp(self):
+        self.file_time = 1544143207
+        self.plus_one_hour = 1544146807
+        self.one_hour_diff = Nums.FTime(self.file_time,
+                                        dt.utcfromtimestamp(self.plus_one_hour))
+
+    def test_has_current_time(self):
+        self.assertIsNotNone(self.one_hour_diff.current_time)
+
+    def test_current_time_is_greater_than_file_time(self):
+        self.assertGreater(self.one_hour_diff.current_time,
+                           self.one_hour_diff.value_date)
+
+    def test_zero_minutes_in_one_hour(self):
+        self.assertRegex(str(self.one_hour_diff), r' 0m')
+
+    def test_1_hour_in_one_hour(self):
+        self.assertRegex(str(self.one_hour_diff), r'^ *1h ')
