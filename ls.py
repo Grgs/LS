@@ -5,7 +5,7 @@ import sys
 from itertools import chain, zip_longest
 from typing import *
 
-from LsLinelist import DirLines, FileLines
+from Linelist import DirLines, FileLines
 
 
 class FSystem:

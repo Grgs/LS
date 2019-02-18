@@ -27,7 +27,7 @@ class FField:
     def __ge__(self, other):
         return self.value >= other.value
 
-    def __hash__(self):
+    def __hash__(self):  #pragma: no cover
         return self.value
 
     def __str__(self):
@@ -73,7 +73,6 @@ class FName(FField):
         self.type = self.is_backup * -4 + self.is_cache * -2 + self.is_hidden * -1
         self.to_delete = False
 
-
     def _str(self) -> str:
         return self.value
 
@@ -82,8 +81,6 @@ class FSize(FField):
 
     def _str(self) -> str:
         return '{:>8}'.format(humanize.naturalsize(self.value, gnu=True))
-        # value = bitmath.Byte(self.value).best_prefix()
-        # return '{0:>6.1f}{1}'.format(value.value, value.unit[0])
 
 
 class FTime(FField):

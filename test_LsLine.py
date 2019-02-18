@@ -1,5 +1,5 @@
 import unittest
-from ls.LsLine import FLine
+from Line import FLine
 
 
 class FFieldTest(unittest.TestCase):
