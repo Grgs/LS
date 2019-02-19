@@ -1,10 +1,9 @@
 import os
 from itertools import chain, zip_longest
 from typing import *
-from Line import FFileLine, FDirLine
-from Linelist import FLines
 
-# from Linelist import DirLines, FileLines
+from Line import FDirLine, FFileLine
+from Linelist import FLines
 
 
 class FSystem:
