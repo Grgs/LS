@@ -4,15 +4,12 @@ from itertools import compress
 
 from Line import FDirLine, FFileLine, FLine
 
-TLine = T.Type[FLine]
-TLineList = T.List[TLine]
-
 
 class FLines:
 
-    def __init__(self):
+    def __init__(self, LineGenerator):
         self._lines: T.List = []
-        self._line_generator = FLine
+        self._line_generator = LineGenerator
         self._current_time = dt.now()
         self._max_name = 15
         self._max_line = 8
@@ -81,17 +78,3 @@ class FLines:
     @property
     def max_line(self):
         return self._max_line
-
-
-class FileLines(FLines):
-
-    def __init__(self):
-        super().__init__()
-        self._line_generator = FFileLine
-
-
-class DirLines(FLines):
-
-    def __init__(self):
-        super().__init__()
-        self._line_generator = FDirLine

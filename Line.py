@@ -1,6 +1,6 @@
 import typing as T
 
-from Nums import FSize, FTime
+from Fields import FSize, FTime
 
 
 class FLine:
