@@ -1,6 +1,6 @@
 import typing as T
 
-from Fields import FSize, FTime
+from Fields import FSize, FTime, FName
 
 
 class FLine:
@@ -21,7 +21,8 @@ class FLine:
         self.name: str = e.name
         self.stats = stats
         self.current_time = current_time
-        self._lnums: T.List[T.Union[FSize, FTime]] = []
+        self._fields = []
+        # self._fields = [FName(self.name)]
         self.max_name = 15
         self.line_len = 0
         self.is_hidden = self._test_dot(self.name)
@@ -33,7 +34,7 @@ class FLine:
     def _str(self) -> str:
         return ' '.join([
             self.name.ljust(self.max_name, ' '),
-            ' '.join([str(f) for f in self._lnums])
+            ' '.join([str(f) for f in self._fields])
         ])
 
     def __lt__(self, other):
@@ -73,12 +74,12 @@ class FLine:
 
     def get_str(self, max_name: int):
         return self.name.ljust(
-            max_name, fillchar=' ') + ' '.join([str(f) for f in self._lnums])
+            max_name, fillchar=' ') + ' '.join([str(f) for f in self._fields])
 
     def get_empty(self, max_name: int = None):
         if max_name is None:
-            return ' ' * (self.max_name + len(self._lnums) * 8)
-        return ' ' * (max_name + len(self._lnums) * 8)
+            return ' ' * (self.max_name + len(self._fields) * 8)
+        return ' ' * (max_name + len(self._fields) * 8)
 
     @property
     def size(self):
@@ -89,29 +90,29 @@ class FFileLine(FLine):
 
     def __init__(self, e, stats, current_time):
         super().__init__(e, stats, current_time)
-        self._lnums = [
+        self._fields.extend([
             FSize(stats.st_size),
             # FTime(stats.st_atime, current_time),
             FTime(stats.st_mtime, current_time),
-        ]
-        self.line_len = len(self._lnums)
+        ])
+        self.line_len = len(self._fields)
         self.sort_by = -1 * self.size
 
     def __len__(self):
-        return len(self._lnums)
+        return len(self._fields)
 
     def get_str(self, max_name: int):
         return str.ljust(self.name, max_name, ' ') + ' '.join(
-            [str(f) for f in self._lnums])
+            [str(f) for f in self._fields])
 
 
 class FDirLine(FLine):
 
     def __init__(self, e, stats, current_time):
         super().__init__(e, stats, current_time)
-        self._lnums = [
+        self._fields.extend([
             FTime(stats.st_mtime, current_time),
-        ]
+        ])
         self.line_len = 1
         self.sort_by = self.name
 
@@ -119,4 +120,4 @@ class FDirLine(FLine):
         return 1
 
     def get_str(self, max_name: int):
-        return str.ljust(self.name, max_name, ' ') + str(self._lnums[0])
+        return str.ljust(self.name, max_name, ' ') + str(self._fields[0])

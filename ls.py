@@ -12,7 +12,7 @@ def _get_entries(_path: str):
     with os.scandir(_path) as osscandir:
         for e in osscandir:
             entries.add(e, e.stat())
-    entries.complete()
+    entries.finish()
     return entries
 
 
@@ -30,7 +30,7 @@ def main():
         _paths = ['.']
     for _path in _paths:
         print(os.path.realpath(_path))
-        print(_get_entries(_path).print_lines())
+        print(_get_entries(_path).get_lines())
 
 
 if __name__ == "__main__":

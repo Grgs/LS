@@ -27,7 +27,7 @@ class FSystem:
         else:
             self._dir_lines.add(e, stats)
 
-    def complete(self):
+    def finish(self):
         list_compress = []
         for fline in self._file_lines.get_raw_lines():
             if fline.is_backup:
@@ -45,7 +45,7 @@ class FSystem:
         empty = self._file_lines.get_empty_line()
         return empty + line[2:] if line.startswith('  ') else line
 
-    def print_lines(self):
+    def get_lines(self):
         line_gen = list(
             zip_longest(
                 self._file_lines.get_lines(),
