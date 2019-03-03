@@ -94,7 +94,7 @@ class FTime(FField):
 
     def __init__(self, value, current_time=dt.now()):
         self.current_time = current_time
-        self.value_date = dt.utcfromtimestamp(value)
+        self.value_date = dt.fromtimestamp(value)
         super().__init__(value)
 
     def _str(self) -> str:
