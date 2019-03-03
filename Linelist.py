@@ -25,14 +25,11 @@ class FLines:
         self._lines.append(line)
         self._check_max(line)
 
-    def _append_backup_to_line_name(self, index):
-        self._lines[index].name += '/~'
-        self._check_max(self._lines[index])
-
     def mark_backup_line(self, f_in_line):
-        for i, fline in enumerate(self._lines, 0):
+        for index, fline in enumerate(self._lines, 0):
             if f_in_line.name[:-1] == fline.name:
-                self._append_backup_to_line_name(i)
+                self._lines[index].name += '/~'
+                self._check_max(self._lines[index])
                 return True
         return False
 
