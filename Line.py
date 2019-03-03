@@ -22,6 +22,7 @@ class FLine:
         self.stats = stats
         self.current_time = current_time
         self._fields = []
+        self._name_index = 0
         self.max_name = 15
         self.line_len = 0
         self.is_hidden = self._test_dot(self.name)
@@ -72,13 +73,17 @@ class FLine:
         return self._str()
 
     def get_str(self, max_name: int):
-        self._fields[0] = self._fields[0].finish(max_name)
+        self._fields[self._name_index] = self._fields[0].finish(max_name)
         return ' '.join([str(f) for f in self._fields])
 
     def get_empty(self, max_name: int = None):
         if max_name is None:
             return ' ' * (self.max_name + len(self._fields) * 8)
         return ' ' * (max_name + len(self._fields) * 8)
+
+    def append_backup_ending(self):
+        self.name += '/~'
+        self._fields[self._name_index].string_val += '/~'
 
     @property
     def size(self):

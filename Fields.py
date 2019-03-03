@@ -80,7 +80,7 @@ class FName(FField):
         return self.string_val
 
     def finish(self, max_name):
-        self.string_val = str.ljust(self.value, max_name, ' ')
+        self.string_val = str.ljust(self.string_val, max_name, ' ')
         return self
 
 
