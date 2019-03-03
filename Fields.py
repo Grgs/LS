@@ -38,43 +38,50 @@ class FField:
     def _str(self) -> str:
         return str(self.value)
 
+    def finish(self, max_name):
+        return self
+
 
 class FName(FField):
 
-    @staticmethod
-    def _test_dot(name):
-        return name.startswith('.')
+    # @staticmethod
+    # def _test_dot(name):
+    #     return name.startswith('.')
 
-    @staticmethod
-    def _test_tilda(name):
-        return name.endswith('~')
+    # @staticmethod
+    # def _test_tilda(name):
+    #     return name.endswith('~')
 
-    @staticmethod
-    def _test_underscore(name):
-        return name.startswith('_')
+    # @staticmethod
+    # def _test_underscore(name):
+    #     return name.startswith('_')
 
     def __init__(self, value):
         super().__init__(value)
-        if len(self.value) < 2:
-            self._first_char = self.value
-            self._pieces = []
-            self.base = self.value
-            self.extentions = []
-        else:
-            self._first_char = self.value[0]
-            self._pieces = self.value[1:].split('.')
-            self.base = self._first_char + self._pieces[0]
-            self.extentions = []
-            if len(self._pieces) > 1:
-                self.extentions = self._pieces[1:]
-        self.is_hidden = self._test_dot(self.value)
-        self.is_backup = self._test_tilda(self.value)
-        self.is_cache = self._test_underscore(self.value)
-        self.type = self.is_backup * -4 + self.is_cache * -2 + self.is_hidden * -1
-        self.to_delete = False
+        # if len(self.value) < 2:
+        #     self._first_char = self.value
+        #     self._pieces = []
+        #     self.base = self.value
+        #     self.extentions = []
+        # else:
+        #     self._first_char = self.value[0]
+        #     self._pieces = self.value[1:].split('.')
+        #     self.base = self._first_char + self._pieces[0]
+        #     self.extentions = []
+        #     if len(self._pieces) > 1:
+        #         self.extentions = self._pieces[1:]
+        # self.is_hidden = self._test_dot(self.value)
+        # self.is_backup = self._test_tilda(self.value)
+        # self.is_cache = self._test_underscore(self.value)
+        # self.type = self.is_backup * -4 + self.is_cache * -2 + self.is_hidden * -1
+        self.string_val = self.value
 
     def _str(self) -> str:
-        return self.value
+        return self.string_val
+
+    def finish(self, max_name):
+        self.string_val = str.ljust(self.value, max_name, ' ')
+        return self
 
 
 class FSize(FField):

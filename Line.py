@@ -22,7 +22,6 @@ class FLine:
         self.stats = stats
         self.current_time = current_time
         self._fields = []
-        # self._fields = [FName(self.name)]
         self.max_name = 15
         self.line_len = 0
         self.is_hidden = self._test_dot(self.name)
@@ -73,8 +72,8 @@ class FLine:
         return self._str()
 
     def get_str(self, max_name: int):
-        return self.name.ljust(
-            max_name, fillchar=' ') + ' '.join([str(f) for f in self._fields])
+        self._fields[0] = self._fields[0].finish(max_name)
+        return ' '.join([str(f) for f in self._fields])
 
     def get_empty(self, max_name: int = None):
         if max_name is None:
@@ -90,9 +89,9 @@ class FFileLine(FLine):
 
     def __init__(self, e, stats, current_time):
         super().__init__(e, stats, current_time)
-        self._fields.extend([
+        self._fields = ([
+            FName(self.name),
             FSize(stats.st_size),
-            # FTime(stats.st_atime, current_time),
             FTime(stats.st_mtime, current_time),
         ])
         self.line_len = len(self._fields)
@@ -101,23 +100,17 @@ class FFileLine(FLine):
     def __len__(self):
         return len(self._fields)
 
-    def get_str(self, max_name: int):
-        return str.ljust(self.name, max_name, ' ') + ' '.join(
-            [str(f) for f in self._fields])
-
 
 class FDirLine(FLine):
 
     def __init__(self, e, stats, current_time):
         super().__init__(e, stats, current_time)
-        self._fields.extend([
+        self._fields = ([
+            FName(self.name),
             FTime(stats.st_mtime, current_time),
         ])
-        self.line_len = 1
+        self.line_len = len(self._fields)
         self.sort_by = self.name
 
     def __len__(self):
-        return 1
-
-    def get_str(self, max_name: int):
-        return str.ljust(self.name, max_name, ' ') + str(self._fields[0])
+        return len(self._fields)
