@@ -21,16 +21,16 @@ class FSystem:
                 [self._dir_lines.get_lines(),
                  self._file_lines.get_lines()]))
 
-    def add(self, e, stats):
-        if e.is_file():
-            self._file_lines.add(e, stats)
+    def add(self, e):
+        if e.is_file:
+            self._file_lines.add(e)
         else:
-            self._dir_lines.add(e, stats)
+            self._dir_lines.add(e)
 
     def finish(self):
         list_compress = []
         for fline in self._file_lines.get_raw_lines():
-            if fline.is_backup:
+            if fline.e.is_backup:
                 if self._file_lines.mark_backup_line(fline):
                     list_compress.append(0)
                 else:

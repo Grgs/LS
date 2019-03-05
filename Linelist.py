@@ -8,29 +8,20 @@ from Line import FDirLine, FFileLine, FLine
 class FLines:
 
     def __init__(self, LineGenerator):
-        self._lines: T.List = []
+        self._lines: T.List[FFileLine, FDirLine] = []
         self._line_generator = LineGenerator
         self._current_time = dt.now()
-        self._max_name = 15
-        self._max_line = 8
+        self._max_line = self._max_name = 15
         self._index = 0
 
-    def _check_max(self, line):
-        local_max = len(line.name) + 1
-        if local_max > self._max_name:
-            self._max_name = local_max
-
-    def add(self, e, stats):
-        line = self._line_generator(e, stats, self._current_time)
+    def add(self, e):
+        line = self._line_generator(e, self._current_time)
         self._lines.append(line)
-        self._check_max(line)
 
     def mark_backup_line(self, f_in_line):
         for index, fline in enumerate(self._lines, 0):
             if f_in_line.name[:-1] == fline.name:
-                # self._lines[index].name += '/~'
                 self._lines[index].append_backup_ending()
-                self._check_max(self._lines[index])
                 return True
         return False
 
@@ -46,17 +37,17 @@ class FLines:
     def __getitem__(self, key: int):
         return self._lines[key]
 
-    def _set_max_line(self, max_name: int, line_len: int, field_size=8):
-        self._max_line = max_name + line_len * field_size
+    def _set_max_line(self):
+        self._max_line = max([len(i) for i in self._lines])
+        self._max_name = max([len(i.name) for i in self._lines])
 
     def complete(self):
         if self._lines != []:
-            # last_line = self._lines[-1]
-            self._set_max_line(self.max_name, len(self._lines[0]))
+            self._set_max_line()
             self._lines = sorted(self._lines)
 
-    def get_empty_line(self):
-        return ' ' * (self._max_line)
+    def get_empty_line(self) -> str:
+        return ' ' * (self._max_line + 2)
 
     def get_lines(self) -> T.List[str]:
         return [line.get_str(self._max_name) for line in self._lines]

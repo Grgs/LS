@@ -1,34 +1,20 @@
 import typing as T
 
-from Fields import FSize, FTime, FName
+from Entry import FEntry
+from Fields import FName, FSize, FTime
 
 
 class FLine:
 
-    @staticmethod
-    def _test_dot(name):
-        return name.startswith('.')
-
-    @staticmethod
-    def _test_tilda(name):
-        return name.endswith('~')
-
-    @staticmethod
-    def _test_underscore(name):
-        return name.startswith('_')
-
-    def __init__(self, e, stats, current_time):
-        self.name: str = e.name
-        self.stats = stats
+    def __init__(self, e, current_time):
+        self.e = e
+        self.name = self.e.name
         self.current_time = current_time
         self._fields = []
         self._name_index = 0
         self.max_name = 15
         self.line_len = 0
-        self.is_hidden = self._test_dot(self.name)
-        self.is_backup = self._test_tilda(self.name)
-        self.is_cache = self._test_underscore(self.name)
-        self.type = self.is_backup * -4 + self.is_cache * -2 + self.is_hidden * -1
+        self.type = self.e.type
         self.sort_by = None
 
     def _str(self) -> str:
@@ -66,56 +52,46 @@ class FLine:
     def __hash__(self):
         return self._str()
 
-    def __len__(self):
-        return self.line_len
-
     def __str__(self):
         return self._str()
 
-    def get_str(self, max_name: int):
+    def get_str(self, max_name: int) -> str:
         self._fields[self._name_index] = self._fields[0].finish(max_name)
         return ' '.join([str(f) for f in self._fields])
 
-    def get_empty(self, max_name: int = None):
-        if max_name is None:
-            return ' ' * (self.max_name + len(self._fields) * 8)
-        return ' ' * (max_name + len(self._fields) * 8)
+    def __len__(self):
+        return self.line_len
+
+    # def get_empty(self, max_name: int = None) -> str:
+    #     if max_name is None:
+    #         return ' ' * (self.max_name + len(self._fields) * 8)
+    #     return ' ' * (max_name + len(self._fields) * 8)
 
     def append_backup_ending(self):
         self.name += '/~'
         self._fields[self._name_index].string_val += '/~'
 
-    @property
-    def size(self):
-        return self.stats.st_size
-
 
 class FFileLine(FLine):
 
-    def __init__(self, e, stats, current_time):
-        super().__init__(e, stats, current_time)
-        self._fields = ([
+    def __init__(self, e, current_time):
+        super().__init__(e, current_time)
+        self._fields = [
             FName(self.name),
-            FSize(stats.st_size),
-            FTime(stats.st_mtime, current_time),
-        ])
-        self.line_len = len(self._fields)
-        self.sort_by = -1 * self.size
-
-    def __len__(self):
-        return len(self._fields)
+            FSize(self.e.size),
+            FTime(self.e.mtime, current_time),
+        ]
+        self.line_len = len(self.name) + (len(self._fields) - 1) * 8
+        self.sort_by = -1 * self.e.size
 
 
 class FDirLine(FLine):
 
-    def __init__(self, e, stats, current_time):
-        super().__init__(e, stats, current_time)
-        self._fields = ([
+    def __init__(self, e, current_time):
+        super().__init__(e, current_time)
+        self._fields = [
             FName(self.name),
-            FTime(stats.st_mtime, current_time),
-        ])
-        self.line_len = len(self._fields)
+            FTime(self.e.mtime, current_time),
+        ]
+        self.line_len = len(self.name) + (len(self._fields) - 1) * 8
         self.sort_by = self.name
-
-    def __len__(self):
-        return len(self._fields)
