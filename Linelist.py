@@ -11,7 +11,7 @@ class FLines:
         self._lines: T.List[FFileLine, FDirLine] = []
         self._line_generator = LineGenerator
         self._current_time = dt.now()
-        self._max_line = self._max_name = 15
+        self._max_line = self._max_name = 12
         self._index = 0
 
     def add(self, e):

@@ -12,7 +12,7 @@ class FLine:
         self.current_time = current_time
         self._fields = []
         self._name_index = 0
-        self.max_name = 15
+        self.max_name = 12
         self.line_len = 0
         self.type = self.e.type
         self.sort_by = None
