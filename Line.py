@@ -62,11 +62,6 @@ class FLine:
     def __len__(self):
         return self.line_len
 
-    # def get_empty(self, max_name: int = None) -> str:
-    #     if max_name is None:
-    #         return ' ' * (self.max_name + len(self._fields) * 8)
-    #     return ' ' * (max_name + len(self._fields) * 8)
-
     def append_backup_ending(self):
         self.name += '/~'
         self._fields[self._name_index].string_val += '/~'
