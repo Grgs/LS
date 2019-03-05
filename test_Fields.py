@@ -58,8 +58,8 @@ class FTimeTest(unittest.TestCase):
     def setUp(self):
         self.file_time = 1544143207
         self.plus_one_hour = 1544146807
-        self.one_hour_diff = Fields.FTime(
-            self.file_time, dt.utcfromtimestamp(self.plus_one_hour))
+        self.one_hour_diff = Fields.FTime(self.file_time,
+                                          dt.fromtimestamp(self.plus_one_hour))
 
     def test_has_current_time(self):
         self.assertIsNotNone(self.one_hour_diff.current_time)
