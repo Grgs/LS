@@ -1,18 +1,18 @@
 import unittest
 from datetime import datetime as dt
 
-import Fields
+import Field
 
 
 class FFieldTest(unittest.TestCase):
 
     def setUp(self):
-        self.fourty_two = Fields.FField(42)
-        self.another_fourty_two = Fields.FField(42)
-        self.fourty_one = Fields.FField(41)
+        self.fourty_two = Field.FField(42)
+        self.another_fourty_two = Field.FField(42)
+        self.fourty_one = Field.FField(41)
 
     def test_equals_zero(self):
-        ffield = Fields.FField(0)
+        ffield = Field.FField(0)
         self.assertEqual(ffield.value, 0)
 
     def test_equals_correctly(self):
@@ -44,12 +44,12 @@ class FFieldTest(unittest.TestCase):
 class FSizeTest(unittest.TestCase):
 
     def test_equals_zero(self):
-        fsize = Fields.FSize(0)
+        fsize = Field.FSize(0)
         self.assertRegex(str(fsize), ' *0B')
         # assert str(fsize).endswith(' 0B')
 
     def test_equals_zero(self):
-        fsize = Fields.FSize(1024)
+        fsize = Field.FSize(1024)
         self.assertRegex(str(fsize), ' *1\.0K')
 
 
@@ -58,7 +58,7 @@ class FTimeTest(unittest.TestCase):
     def setUp(self):
         self.file_time = 1544143207
         self.plus_one_hour = 1544146807
-        self.one_hour_diff = Fields.FTime(self.file_time,
+        self.one_hour_diff = Field.FTime(self.file_time,
                                           dt.fromtimestamp(self.plus_one_hour))
 
     def test_has_current_time(self):
