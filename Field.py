@@ -7,7 +7,7 @@ class FField:
 
     def __init__(self, value):
         self.value = value
-        self._stored_string = None
+        self.stored_string = None
 
     def __eq__(self, other):
         return self.value == other.value
@@ -31,9 +31,9 @@ class FField:
         return self.value
 
     def __str__(self):
-        if self._stored_string is None:
-            self._stored_string = self._str()
-        return self._stored_string
+        if self.stored_string is None:
+            self.stored_string = self._str()
+        return self.stored_string
 
     def _str(self) -> str:
         return str(self.value)
@@ -46,13 +46,23 @@ class FName(FField):
 
     def __init__(self, value):
         super().__init__(value)
-        self.string_val = self.value
+        self.stored_string = self.value
 
     def _str(self) -> str:
-        return self.string_val
+        return self.stored_string
+
+
+class FSpace(FField):
+
+    def __init__(self, value):
+        self.value = len(value)
+        self.stored_string = None
+
+    def _str(self):
+        return ' '
 
     def finish(self, max_name):
-        self.string_val = str.ljust(self.string_val, max_name, ' ')
+        self.stored_string = (max_name - self.value) * ' '
         return self
 
 

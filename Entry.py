@@ -1,7 +1,7 @@
 import typing as T
 
 from Value import FValue
-from Field import FName, FSize, FTime
+from Field import FName, FSize, FTime, FSpace
 
 
 class FEntry:
@@ -12,6 +12,7 @@ class FEntry:
         self.current_time = current_time
         self._fields = []
         self._name_index = 0
+        self._space_index = 1
         self.max_name = 12
         self.line_len = 0
         self.type = self.e.type
@@ -56,7 +57,8 @@ class FEntry:
         return self._str()
 
     def get_str(self, max_name: int) -> str:
-        self._fields[self._name_index] = self._fields[0].finish(max_name)
+        self._fields[self._space_index] = self._fields[
+            self._space_index].finish(max_name)
         return ' '.join([str(f) for f in self._fields])
 
     def __len__(self):
@@ -64,7 +66,8 @@ class FEntry:
 
     def append_backup_ending(self):
         self.name += '/~'
-        self._fields[self._name_index].string_val += '/~'
+        self._fields[self._name_index].stored_string += '/~'
+        self._fields[self._space_index].value += 2
 
 
 class FFileEntry(FEntry):
@@ -73,6 +76,7 @@ class FFileEntry(FEntry):
         super().__init__(e, current_time)
         self._fields = [
             FName(self.name),
+            FSpace(self.name),
             FSize(self.e.size),
             FTime(self.e.mtime, current_time),
         ]
@@ -86,6 +90,7 @@ class FDirEntry(FEntry):
         super().__init__(e, current_time)
         self._fields = [
             FName(self.name),
+            FSpace(self.name),
             FTime(self.e.mtime, current_time),
         ]
         self.line_len = len(self.name) + (len(self._fields) - 1) * 8
