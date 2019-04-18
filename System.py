@@ -2,15 +2,15 @@ import os
 from itertools import chain, zip_longest
 from typing import *
 
-from Line import FDirLine, FFileLine
+from Entry import FDirEntry, FFileEntry
 from Linelist import FLines
 
 
 class FSystem:
 
     def __init__(self):
-        self._file_lines = FLines(FFileLine)
-        self._dir_lines = FLines(FDirLine)
+        self._file_lines = FLines(FFileEntry)
+        self._dir_lines = FLines(FDirEntry)
 
     def __repr__(self):
         return '{!r} \n{!r}'.format(self._file_lines, self._dir_lines)

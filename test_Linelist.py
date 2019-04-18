@@ -1,14 +1,14 @@
 import unittest
 
-from Line import FDirLine, FFileLine, FLine
+from Entry import FDirEntry, FFileEntry, FEntry
 from Linelist import FLines
 
 
 class FFieldTest(unittest.TestCase):
 
     def setUp(self):
-        self.fileline = FLines(FFileLine)
-        self.dirline = FLines(FDirLine)
+        self.fileline = FLines(FFileEntry)
+        self.dirline = FLines(FDirEntry)
 
     def test_fileline_generates_something(self):
         self.assertIsNotNone(self.fileline)

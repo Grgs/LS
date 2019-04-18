@@ -1,9 +1,9 @@
 import unittest
 
-from Line import FLine
+from Entry import FEntry
 
 
 class FFieldTest(unittest.TestCase):
 
     def test_static_dot_test(self):
-        self.assertEqual(True, FLine._test_dot('.name'))
+        self.assertEqual(True, FEntry._test_dot('.name'))

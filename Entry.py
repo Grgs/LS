@@ -4,7 +4,7 @@ from Value import FValue
 from Field import FName, FSize, FTime
 
 
-class FLine:
+class FEntry:
 
     def __init__(self, e, current_time):
         self.e = e
@@ -67,7 +67,7 @@ class FLine:
         self._fields[self._name_index].string_val += '/~'
 
 
-class FFileLine(FLine):
+class FFileEntry(FEntry):
 
     def __init__(self, e, current_time):
         super().__init__(e, current_time)
@@ -80,7 +80,7 @@ class FFileLine(FLine):
         self.sort_by = -1 * self.e.size
 
 
-class FDirLine(FLine):
+class FDirEntry(FEntry):
 
     def __init__(self, e, current_time):
         super().__init__(e, current_time)

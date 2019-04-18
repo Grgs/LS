@@ -2,13 +2,13 @@ import typing as T
 from datetime import datetime as dt
 from itertools import compress
 
-from Line import FDirLine, FFileLine, FLine
+from Entry import FDirEntry, FFileEntry, FEntry
 
 
 class FLines:
 
     def __init__(self, LineGenerator):
-        self._lines: T.List[FFileLine, FDirLine] = []
+        self._lines: T.List[FFileEntry, FDirEntry] = []
         self._line_generator = LineGenerator
         self._current_time = dt.now()
         self._max_line = self._max_name = 12
