@@ -1,7 +1,7 @@
 import typing as T
 
 from Entry import FEntry
-from Fields import FName, FSize, FTime
+from Field import FName, FSize, FTime
 
 
 class FLine:
