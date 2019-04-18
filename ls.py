@@ -4,7 +4,7 @@ import os
 import sys
 from typing import *
 
-from Entry import FEntry
+from Value import FValue
 from System import FSystem
 
 
@@ -12,7 +12,7 @@ def _get_entries(_path: str):
     entries = FSystem()
     with os.scandir(_path) as osscandir:
         for e in osscandir:
-            entries.add(FEntry(e))
+            entries.add(FValue(e))
     entries.finish()
     return entries
 

@@ -1,6 +1,6 @@
 import typing as T
 
-from Entry import FEntry
+from Value import FValue
 from Field import FName, FSize, FTime
 
 

@@ -1,4 +1,4 @@
-class FEntry:
+class FValue:
 
     @staticmethod
     def _test_dot(name):
