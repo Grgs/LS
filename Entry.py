@@ -68,7 +68,7 @@ class FEntry:
         self.name += '/~'
         self._fields[self._name_index].stored_string += '/~'
         self._fields[self._space_index].value += 2
-
+    
 
 class FFileEntry(FEntry):
 
@@ -80,7 +80,8 @@ class FFileEntry(FEntry):
             FSize(self.e.size),
             FTime(self.e.mtime, current_time),
         ]
-        self.line_len = len(self.name) + (len(self._fields) - 1) * 8
+        # self.line_len = len(self.name) + (len(self._fields) - 1) * 8
+        # self.line_len = self.max_name + (len(self._fields) - 2) * 8
         self.sort_by = -1 * self.e.size
 
 
@@ -93,5 +94,5 @@ class FDirEntry(FEntry):
             FSpace(self.name),
             FTime(self.e.mtime, current_time),
         ]
-        self.line_len = len(self.name) + (len(self._fields) - 1) * 8
+        # self.line_len = len(self.name) + (len(self._fields) - 2) * 8
         self.sort_by = self.name

@@ -38,8 +38,9 @@ class FLines:
         return self._lines[key]
 
     def _set_max_line(self):
-        self._max_line = max([len(i) for i in self._lines])
+        # self._max_line = max([len(i) for i in self._lines])
         self._max_name = max([len(i.name) for i in self._lines])
+        self._max_line = self._max_name + 2 * 8 + 1
 
     def complete(self):
         if self._lines != []:
@@ -58,11 +59,6 @@ class FLines:
     @property
     def max_name(self):
         return self._max_name
-
-    @max_name.setter
-    def max_name(self, max_name: int):
-        self._max_name = max_name
-        self._max_line = max_name + len(self._lines[0]) * 8
 
     @property
     def max_line(self):
