@@ -50,7 +50,7 @@ class FLines:
                 list_compress.append(1)
         self._delete_lines(list_compress)
 
-    def complete(self):
+    def finalize(self):
         if self._lines != []:
             self._set_max_line()
             self._lines = sorted(self._lines)

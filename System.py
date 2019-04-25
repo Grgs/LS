@@ -34,8 +34,8 @@ class FSystem:
 
     def _finalize(self):
         self._file_lines.delete_tmps_from_list()
-        self._file_lines.complete()
-        self._dir_lines.complete()
+        self._file_lines.finalize()
+        self._dir_lines.finalize()
         self._finalized = True
 
     def get_lines(self):
