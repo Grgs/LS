@@ -11,6 +11,7 @@ class FSystem:
     def __init__(self):
         self._file_lines = FLines(FFileEntry)
         self._dir_lines = FLines(FDirEntry)
+        self._finalized = False
 
     def __repr__(self):
         return '{!r} \n{!r}'.format(self._file_lines, self._dir_lines)
@@ -27,25 +28,19 @@ class FSystem:
         else:
             self._dir_lines.add(e)
 
-    def finish(self):
-        list_compress = []
-        for fline in self._file_lines.get_raw_lines():
-            if fline.e.is_backup:
-                if self._file_lines.mark_backup_line(fline):
-                    list_compress.append(0)
-                else:
-                    list_compress.append(1)
-            else:
-                list_compress.append(1)
-        self._file_lines.delete_lines(list_compress)
-        self._file_lines.complete()
-        self._dir_lines.complete()
-
     def _add_empty_start(self, line: str):
         empty = self._file_lines.get_empty_line()
         return empty + line[2:] if line.startswith('  ') else line
 
+    def _finalize(self):
+        self._file_lines.delete_tmps_from_list()
+        self._file_lines.complete()
+        self._dir_lines.complete()
+        self._finalized = True
+
     def get_lines(self):
+        if not self._finalized:
+            self._finalize()
         line_gen = list(
             zip_longest(
                 self._file_lines.get_lines(),

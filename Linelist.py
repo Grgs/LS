@@ -18,14 +18,14 @@ class FLines:
         line = self._line_generator(e, self._current_time)
         self._lines.append(line)
 
-    def mark_backup_line(self, f_in_line):
+    def _mark_backup_line(self, f_in_line):
         for index, fline in enumerate(self._lines, 0):
             if f_in_line.name[:-1] == fline.name:
                 self._lines[index].append_backup_ending()
-                return True
-        return False
+                return 0
+        return 1
 
-    def delete_lines(self, compression_index):
+    def _delete_lines(self, compression_index):
         self._lines = list(compress(self._lines, compression_index))
 
     def __str__(self) -> str:
@@ -38,9 +38,17 @@ class FLines:
         return self._lines[key]
 
     def _set_max_line(self):
-        # self._max_line = max([len(i) for i in self._lines])
         self._max_name = max([len(i.name) for i in self._lines])
         self._max_line = self._max_name + 2 * 8 + 1
+
+    def delete_tmps_from_list(self):
+        list_compress = []
+        for fline in self._lines:
+            if fline.e.is_backup:
+                list_compress.append(self._mark_backup_line(fline))
+            else:
+                list_compress.append(1)
+        self._delete_lines(list_compress)
 
     def complete(self):
         if self._lines != []:

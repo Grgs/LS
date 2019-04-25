@@ -13,7 +13,6 @@ def _get_entries(_path: str):
     with os.scandir(_path) as osscandir:
         for e in osscandir:
             entries.add(FValue(e))
-    entries.finish()
     return entries
 
 
