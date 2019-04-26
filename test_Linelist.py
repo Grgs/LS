@@ -1,7 +1,7 @@
 import unittest
 
 from Entry import FDirEntry, FFileEntry, FEntry
-from Linelist import FLines
+from Lines import FLines
 
 
 class FFieldTest(unittest.TestCase):

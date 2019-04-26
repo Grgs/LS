@@ -1,12 +1,12 @@
 import unittest
 
-from System import FSystem
+from OutputLines import OutputLines
 
 
 class FFieldTest(unittest.TestCase):
 
     def setUp(self):
-        self.fsys = FSystem()
+        self.fsys = OutputLines()
 
     def test_fsystem_init(self):
         self.assertIsNotNone(self.fsys)

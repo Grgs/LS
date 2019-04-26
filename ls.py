@@ -5,11 +5,11 @@ import sys
 from typing import *
 
 from Value import FValue
-from System import FSystem
+from OutputLines import OutputLines
 
 
 def _get_entries(_path: str):
-    entries = FSystem()
+    entries = OutputLines()
     with os.scandir(_path) as osscandir:
         for e in osscandir:
             entries.add(FValue(e))
