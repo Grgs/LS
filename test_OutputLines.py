@@ -8,5 +8,5 @@ class FFieldTest(unittest.TestCase):
     def setUp(self):
         self.fsys = OutputLines()
 
-    def test_fsystem_init(self):
+    def test_OutputLines_init(self):
         self.assertIsNotNone(self.fsys)
