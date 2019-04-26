@@ -1,6 +1,6 @@
 import unittest
 
-from Entry import FEntry
+from FileEntry import FEntry
 
 
 class FFieldTest(unittest.TestCase):

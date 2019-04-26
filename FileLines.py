@@ -2,7 +2,7 @@ import typing as T
 from datetime import datetime as dt
 from itertools import compress
 
-from Entry import FDirEntry, FFileEntry, FEntry
+from FileEntry import FDirEntry, FFileEntry, FEntry
 
 
 class FLines:

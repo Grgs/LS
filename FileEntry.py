@@ -1,7 +1,7 @@
 import typing as T
 
-from Value import FValue
-from Field import FName, FSize, FTime, FSpace
+from FileValue import FValue
+from FileField import FName, FSize, FTime, FSpace
 
 
 class FEntry:

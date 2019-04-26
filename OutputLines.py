@@ -2,8 +2,8 @@ import os
 from itertools import chain, zip_longest
 from typing import *
 
-from Entry import FDirEntry, FFileEntry
-from Lines import FLines
+from FileEntry import FDirEntry, FFileEntry
+from FileLines import FLines
 
 
 class OutputLines:
