@@ -3,7 +3,7 @@ from itertools import chain, zip_longest
 from typing import *
 
 from Entry import FDirEntry, FFileEntry
-from Linelist import FLines
+from Lines import FLines
 
 
 class FSystem:
@@ -41,10 +41,10 @@ class FSystem:
     def get_lines(self):
         if not self._finalized:
             self._finalize()
-        line_gen = list(
+        line_output = list(
             zip_longest(
                 self._file_lines.get_lines(),
                 self._dir_lines.get_lines(),
                 fillvalue=' '))
-        text = list(map(self._add_empty_start, map(' | '.join, line_gen)))
+        text = list(map(self._add_empty_start, map(' | '.join, line_output)))
         return '\n'.join(text)
