@@ -5,15 +5,15 @@ import sys
 from typing import *
 
 from FileValue import FValue
-from OutputLines import OutputLines
+from AllLines import AllLines
 
 
-def _get_entries(_path: str):
-    entries = OutputLines()
+def _get_file_lines(_path: str):
+    file_lines = AllLines()
     with os.scandir(_path) as osscandir:
         for e in osscandir:
-            entries.add(FValue(e))
-    return entries
+            file_lines.add(FValue(e))
+    return file_lines
 
 
 def main():
@@ -30,7 +30,7 @@ def main():
         _paths = ['.']
     for _path in _paths:
         print(os.path.realpath(_path))
-        print(_get_entries(_path).get_lines())
+        print(_get_file_lines(_path).get_lines())
 
 
 if __name__ == "__main__":

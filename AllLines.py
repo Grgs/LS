@@ -6,7 +6,7 @@ from FileEntry import FDirEntry, FFileEntry
 from FileLines import FLines
 
 
-class OutputLines:
+class AllLines:
 
     def __init__(self):
         self._file_lines = FLines(FFileEntry)
