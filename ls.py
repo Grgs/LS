@@ -8,7 +8,7 @@ from FileValue import FValue
 from AllLines import AllLines
 
 
-def _get_file_lines(_path: str):
+def _file_lines(_path: str):
     file_lines = AllLines()
     with os.scandir(_path) as osscandir:
         for e in osscandir:
@@ -30,7 +30,7 @@ def main():
         _paths = ['.']
     for _path in _paths:
         print(os.path.realpath(_path))
-        print(_get_file_lines(_path).get_lines())
+        print(_file_lines(_path).get_lines())
 
 
 if __name__ == "__main__":
