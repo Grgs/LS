@@ -4,14 +4,22 @@ from typing import *
 
 from FileEntry import FDirEntry, FFileEntry
 from FileLines import FLines
+from FileValue import FValue
 
 
 class AllLines:
 
-    def __init__(self):
+    def __init__(self, path):
         self._file_lines = FLines(FFileEntry)
         self._dir_lines = FLines(FDirEntry)
         self._finalized = False
+        with os.scandir(path) as os_scanner:
+            for ent in os_scanner:
+                e = FValue(ent)
+                if e.is_file:
+                    self._file_lines.add(e)
+                else:
+                    self._dir_lines.add(e)
 
     def __repr__(self):
         return '{!r} \n{!r}'.format(self._file_lines, self._dir_lines)
@@ -21,12 +29,6 @@ class AllLines:
             chain.from_iterable(
                 [self._dir_lines.get_lines(),
                  self._file_lines.get_lines()]))
-
-    def add(self, e):
-        if e.is_file:
-            self._file_lines.add(e)
-        else:
-            self._dir_lines.add(e)
 
     def _add_empty_start(self, line: str):
         empty = self._file_lines.get_empty_line()

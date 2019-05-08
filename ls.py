@@ -4,16 +4,7 @@ import os
 import sys
 from typing import *
 
-from FileValue import FValue
 from AllLines import AllLines
-
-
-def _file_lines(_path: str):
-    file_lines = AllLines()
-    with os.scandir(_path) as osscandir:
-        for e in osscandir:
-            file_lines.add(FValue(e))
-    return file_lines
 
 
 def main():
@@ -30,7 +21,7 @@ def main():
         _paths = ['.']
     for _path in _paths:
         print(os.path.realpath(_path))
-        print(_file_lines(_path).get_lines())
+        print(AllLines(_path).get_lines())
 
 
 if __name__ == "__main__":
