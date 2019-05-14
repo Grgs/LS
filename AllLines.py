@@ -13,6 +13,9 @@ class AllLines:
         self._file_lines = FLines(FFileEntry)
         self._dir_lines = FLines(FDirEntry)
         self._finalized = False
+        self.add_from_path(path)
+
+    def add_from_path(self, path):
         with os.scandir(path) as os_scanner:
             for ent in os_scanner:
                 e = FValue(ent)
