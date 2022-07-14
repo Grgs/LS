@@ -69,16 +69,28 @@ class FEntry:
         self._fields[self._name_index].stored_string += '/~'
         self._fields[self._space_index].value += 2
 
+    def name_entry(self):
+        return FName(self.name)
+
+    def space_entry(self):
+        return FSpace(self.name)
+
+    def size_entry(self):
+        return FSize(self.e.size)
+
+    def time_entry(self):
+        return FTime(self.e.mtime, self.current_time)
+
 
 class FFileEntry(FEntry):
 
     def __init__(self, e, current_time):
         super().__init__(e, current_time)
         self._fields = [
-            FName(self.name),
-            FSpace(self.name),
-            FSize(self.e.size),
-            FTime(self.e.mtime, current_time),
+            self.name_entry(),
+            self.space_entry(),
+            self.size_entry(),
+            self.time_entry(),
         ]
         self.sort_by = -1 * self.e.size
 
@@ -88,8 +100,8 @@ class FDirEntry(FEntry):
     def __init__(self, e, current_time):
         super().__init__(e, current_time)
         self._fields = [
-            FName(self.name),
-            FSpace(self.name),
-            FTime(self.e.mtime, current_time),
+            self.name_entry(),
+            self.space_entry(),
+            self.time_entry(),
         ]
         self.sort_by = self.name
